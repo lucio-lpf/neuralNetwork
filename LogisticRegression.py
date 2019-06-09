@@ -62,7 +62,7 @@ class LogisticRegression:
     def functionInputs(self, theta0, theta1, theta2, data):
         x1 = float(data[0])
         x2 = float(data[1])
-        fInput = theta0 + (x1*x1)*theta1 + (x2*x2)*theta2
+        fInput = theta0 + (x1)*theta1 + (x2)*theta2
         return self.sigmoid(fInput)
 
     #for neurons
@@ -83,7 +83,7 @@ class LogisticRegression:
             if xi == 9:
                 sum = sum + self.diffPredClass(predictions[index], correctClass[index])
             else:
-                sum = sum + (self.diffPredClass(predictions[index], correctClass[index])) * (float(data[xi])*float(data[xi]))
+                sum = sum + (self.diffPredClass(predictions[index], correctClass[index])) * (float(data[xi]))
         return thetaCurrent - alphaLen * sum
 
     def trainning(self, alpha, dataframe, positiveClass, classificationIndex):
@@ -123,5 +123,8 @@ class LogisticRegression:
             theta0 = newTheta0
             theta1 = newTheta1
             theta2 = newTheta2
+            self.thetas[0] = theta0
+            self.thetas[1] = theta1
+            self.thetas[2] = theta2
             print("custo: ", currentCost)
         return pred
