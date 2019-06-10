@@ -5,6 +5,8 @@ import numpy as np
 import math as mt
 from Neuron import Neuron
 
+alpha = 0.01
+
 #treina o modelo
 lr = LogisticRegression("teste.csv")
 
@@ -45,11 +47,11 @@ while (cost > 0.1):
 
         #backpropagation
         d4 = n4.calcDelta([])
-        print("erro : ", d4)
+        #print("erro : ", d4)
 
 
         cost = n4.training(lr.data)
-        #print("custo : ", cost)
+        print("custo : ", cost)
 
         d31 = n31.calcDelta([d4*n4.thetas[0]])
         d32 = n31.calcDelta([d4*n4.thetas[1]])
@@ -64,18 +66,18 @@ while (cost > 0.1):
         grad32 = n32.activation*d4
 
         #change tethas
-        n4.thetas[0] = n4.thetas[0] - 0.1 * grad31 * cost
-        n4.thetas[1] = n4.thetas[1] - 0.1 * grad32 * cost
+        n4.thetas[0] = n4.thetas[0] - alpha * grad31 * cost
+        n4.thetas[1] = n4.thetas[1] - alpha * grad32 * cost
 
         grad211 = n21.activation * d31
         grad221 = n22.activation * d31
         grad231 = n23.activation * d31
         grad241 = n24.activation * d31
 
-        n31.thetas[0] = n31.thetas[0] - 0.1 * grad211 * cost
-        n31.thetas[1] = n31.thetas[1] - 0.1 * grad221 * cost
-        n31.thetas[2] = n31.thetas[2] - 0.1 * grad231 * cost
-        n31.thetas[3] = n31.thetas[3] - 0.1 * grad241 * cost
+        n31.thetas[0] = n31.thetas[0] - alpha * grad211 * cost
+        n31.thetas[1] = n31.thetas[1] - alpha * grad221 * cost
+        n31.thetas[2] = n31.thetas[2] - alpha * grad231 * cost
+        n31.thetas[3] = n31.thetas[3] - alpha * grad241 * cost
 
 
         grad212 = n21.activation * d32
@@ -83,9 +85,19 @@ while (cost > 0.1):
         grad232 = n23.activation * d32
         grad242 = n24.activation * d32
 
-        n32.thetas[0] = n32.thetas[0] - 0.1 * grad212 * cost
-        n32.thetas[1] = n32.thetas[1] - 0.1 * grad222 * cost
-        n32.thetas[2] = n32.thetas[2] - 0.1 * grad232 * cost
-        n32.thetas[3] = n32.thetas[3] - 0.1 * grad242 * cost
+        n32.thetas[0] = n32.thetas[0] - alpha * grad212 * cost
+        n32.thetas[1] = n32.thetas[1] - alpha * grad222 * cost
+        n32.thetas[2] = n32.thetas[2] - alpha * grad232 * cost
+        n32.thetas[3] = n32.thetas[3] - alpha * grad242 * cost
 
+        n21.thetas[0] = n21.thetas[0] - alpha * data[0] * cost
+        n21.thetas[1] = n21.thetas[1] - alpha * data[1] * cost
 
+        n22.thetas[0] = n22.thetas[0] - alpha * data[0] * cost
+        n22.thetas[1] = n22.thetas[1] - alpha * data[1] * cost
+
+        n23.thetas[0] = n23.thetas[0] - alpha * data[0] * cost
+        n23.thetas[1] = n23.thetas[1] - alpha * data[1] * cost
+
+        n24.thetas[0] = n24.thetas[0] - alpha * data[0] * cost
+        n24.thetas[1] = n24.thetas[1] - alpha * data[1] * cost

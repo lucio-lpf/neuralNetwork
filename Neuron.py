@@ -16,7 +16,7 @@ class Neuron:
         print("numero de thetas: ", len(self.thetas))
         self.dataframe = None
         self.predictions = None
-        self.correctClass = None
+        self.correctClass = []
         self.alpha = None
         self.positiveClass = positiveClass
         self.classificationIndex = classificationIndex
@@ -75,6 +75,7 @@ class Neuron:
         for index, theta in enumerate(self.thetas):
             xis.append(datas[index]*theta)
         fInput = sum(xis)
+        fInput = self.activation
         return self.sigmoid(fInput)
 
     def diffPredClass(self, fInput, y):
@@ -93,7 +94,7 @@ class Neuron:
         for index, data in enumerate(dataframe):
             prediction = self.functionInputs(data)
             self.predictions.append(prediction)
-            if data[self.classificationIndex] == self.correctClass:
+            if data[self.classificationIndex] == self.positiveClass:
                 self.correctClass.append(1.0)
             else:
                 self.correctClass.append(0.0)
