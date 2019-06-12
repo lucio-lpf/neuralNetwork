@@ -15,20 +15,20 @@ class LogisticRegression:
             return data
 
     def normalizeData(self):
-        max = [-9999999]*(len(self.data[0]) - 1)
-        min = [9999999]*(len(self.data[0]) - 1)
+        max = [None]*(len(self.data[0]) - 1)
+        min = [None]*(len(self.data[0]) - 1)
         for row in self.data:
             for index in range(0, len(row) - 1):
                 row[index] = float(row[index])
-                if row[index] > max[index]:
+                if max[index] is None or row[index] > max[index]:
                     max[index] = row[index]
-                if row[index] < min[index]:
+                if min[index] is None or row[index] < min[index]:
                     min[index] = row[index]
         print("Normalizando dados")
         for row in self.data:
             for index in range(0, len(row) - 1):
                 row[index] = 2*((row[index]-min[index])/(max[index] - min[index])) -1
-
+                
     #função sigmóide:
     def sigmoid(self, z):
         sig = 1/(1 + math.exp(-z))
