@@ -1,8 +1,7 @@
 import math
 import csv
 import pandas as pd
-from sklearn import preprocessing
-from sklearn.preprocessing import MinMaxScaler
+import random
 
 class LogisticRegression:
     def __init__(self, file):
@@ -11,24 +10,24 @@ class LogisticRegression:
 
     def openDataframe(self, file):
         with open(file) as f:
-            dataFrame = csv.reader(f)
+            dataFrame = csv.reader(f, delimiter="\t", quoting=csv.QUOTE_NONE)
             data = [r for r in dataFrame]
-        minhaData = pd.DataFrame(data)
-        a = minhaData.drop(columns=[1,2])
-        b = minhaData.drop(columns=[0,2])
-        c = minhaData.drop(columns=[0,1])
-        minmaxScaler = preprocessing.MinMaxScaler()
-        normalizeA = minmaxScaler.fit_transform(a)
-        normalizeB = minmaxScaler.fit_transform(b)
-        scal = MinMaxScaler(copy=True, feature_range=(-1, 1))
-        print(scal.fit(normalizeA))
-        print(scal.fit(normalizeB))
-        normalizeA = scal.transform(normalizeA)
-        normalizeB = scal.transform(normalizeB)
-        dfa = pd.DataFrame(normalizeA)
-        dfb = pd.DataFrame(normalizeB)
-        s = pd.concat([dfa, dfb, c], axis=1)
-        return s.values.tolist()
+            return data
+
+    def normalizeData(self):
+        max = [-9999999]*(len(self.data[0]) - 1)
+        min = [9999999]*(len(self.data[0]) - 1)
+        for row in self.data:
+            for index in range(0, len(row) - 1):
+                row[index] = float(row[index])
+                if row[index] > max[index]:
+                    max[index] = row[index]
+                if row[index] < min[index]:
+                    min[index] = row[index]
+        print("Normalizando dados")
+        for row in self.data:
+            for index in range(0, len(row) - 1):
+                row[index] = 2*((row[index]-min[index])/(max[index] - min[index])) -1
 
     #função sigmóide:
     def sigmoid(self, z):
