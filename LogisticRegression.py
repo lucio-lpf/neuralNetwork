@@ -3,22 +3,40 @@ import csv
 import pandas as pd
 import random
 
+
 class LogisticRegression:
     def __init__(self, file):
-        self.data = self.openDataframe(file)
+        self.data, self.results = self.openDataframe(file)
         self.thetas = []
 
     def openDataframe(self, file):
         with open(file) as f:
-            dataFrame = csv.reader(f, delimiter="\t", quoting=csv.QUOTE_NONE)
-            data = [r for r in dataFrame]
-            return data
+            dataFrame = csv.reader(f, delimiter=",", quoting=csv.QUOTE_NONE)
+            all_data = []
+            results = []
+            for row in dataFrame:
+                data = []
+                result = []
+                i = 0
+                while ';' not in row[i]:
+                    data.append(row[i])
+                    i += 1
+                last_atribute, first_output = row[i].split(';')
+                data.append(last_atribute)
+                result.append(first_output)
+                i += 1
+                while i is not len(row):
+                    result.append(row[i])
+                    i += 1
+                all_data.append(data)
+                results.append(result)
+        return all_data, results
 
     def normalizeData(self):
-        max = [None]*(len(self.data[0]) - 1)
-        min = [None]*(len(self.data[0]) - 1)
+        max = [None] * (len(self.data[0]))
+        min = [None] * (len(self.data[0]))
         for row in self.data:
-            for index in range(0, len(row) - 1):
+            for index in range(0, len(row)):
                 row[index] = float(row[index])
                 if max[index] is None or row[index] > max[index]:
                     max[index] = row[index]
@@ -26,18 +44,20 @@ class LogisticRegression:
                     min[index] = row[index]
         print("Normalizando dados")
         for row in self.data:
-            for index in range(0, len(row) - 1):
-                row[index] = 2*((row[index]-min[index])/(max[index] - min[index])) -1
-                
-    #função sigmóide:
+            for index in range(0, len(row)):
+                row[index] = 2 * ((row[index] - min[index]) / (max[index] - min[index])) - 1
+        print(self.data)
+        print(self.results)
+        
+    # função sigmóide:
     def sigmoid(self, z):
-        sig = 1/(1 + math.exp(-z))
+        sig = 1 / (1 + math.exp(-z))
         return sig
 
     # if 1 = true; if 0 = false
     def calculateError(self, y, z):
         if y == 0:
-            if 1-z == 0:
+            if 1 - z == 0:
                 value = 999999
             else:
                 value = -math.log10(1.0 - z)
@@ -53,22 +73,22 @@ class LogisticRegression:
     # zs = classe predita
     def funcJ(self, ys, zs):
         cost = 0
-        for index in range(0,len(zs)):
+        for index in range(0, len(zs)):
             error = self.calculateError(ys[index], zs[index])
             cost = cost + error
-        return cost/len(zs)
+        return cost / len(zs)
 
     def functionInputs(self, theta0, theta1, theta2, data):
         x1 = float(data[0])
         x2 = float(data[1])
-        fInput = theta0 + (x1)*theta1 + (x2)*theta2
+        fInput = theta0 + (x1) * theta1 + (x2) * theta2
         return self.sigmoid(fInput)
 
-    #for neurons
+    # for neurons
     def functionInputsNeuron(self, thetas, data):
         fInput = 0
         for index, theta in thetas:
-            theta*float(data[index])
+            theta * float(data[index])
         result = self.sigmoid(fInput)
         return result
 
@@ -76,7 +96,7 @@ class LogisticRegression:
         return fInput - y
 
     def gradient(self, thetaCurrent, alpha, dataFrame, predictions, correctClass, xi):
-        alphaLen = alpha/len(dataFrame)
+        alphaLen = alpha / len(dataFrame)
         sum = 0
         for index, data in enumerate(dataFrame):
             if xi == 9:
