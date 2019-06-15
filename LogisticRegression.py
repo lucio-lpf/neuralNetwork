@@ -48,7 +48,7 @@ class LogisticRegression:
                 row[index] = 2 * ((row[index] - min[index]) / (max[index] - min[index])) - 1
         print(self.data)
         print(self.results)
-        
+
     # função sigmóide:
     def sigmoid(self, z):
         sig = 1 / (1 + math.exp(-z))

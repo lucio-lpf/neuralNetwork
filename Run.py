@@ -14,8 +14,8 @@ alpha = 0.01
 wine = LogisticRegression("./datasets/wine.csv")
 wine.normalizeData()
 
-# camadas = [3, 2, 1]
-# entradas = len(wine.data[0][0])
-# nn = NeuralNetwork(entradas, camadas)
-# nn.calcula_saidas(wine.data[0])
+camadas = [3, 2, 1]
+entradas = len(wine.data[0]) - 1
+nn = NeuralNetwork(entradas, camadas)
+nn.calcula_saidas(wine.data[0])
 
