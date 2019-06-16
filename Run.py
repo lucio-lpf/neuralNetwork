@@ -11,11 +11,16 @@ alpha = 0.01
 
 #treina o modelo
 
-wine = LogisticRegression("./datasets/wine.csv")
+wine = LogisticRegression("./datasets/teste.csv")
 wine.normalizeData()
 
 camadas = [3, 2, 1]
 entradas = len(wine.data[0]) - 1
 nn = NeuralNetwork(entradas, camadas)
-nn.calcula_saidas(wine.data[0])
+
+
+nn.treina_rede(wine.data[0], wine.results[0])
+
+#for index in range(len(wine.data)):
+#    nn.treina_rede(wine.data[index], wine.results[index])
 

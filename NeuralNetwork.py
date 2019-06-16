@@ -20,6 +20,29 @@ class NeuralNetwork:
         for index, line in enumerate(self.pesos_matriz):
             print(line)
 
+    def treina_rede(self, atributos, resultado):
+        pesos_matriz = self.pesos_matriz
+        ativacao_matriz = self.calcula_saidas(atributos)
+        saida_da_rede = ativacao_matriz[len(ativacao_matriz) - 1]
+        delta_matriz = ativacao_matriz
+
+        for index in reversed(range(len(delta_matriz))):
+            if index == len(delta_matriz) - 1:
+                delta_matriz[index] = self.delta_camada_saida(saida_da_rede, resultado)
+            else:
+                delta_matriz[index] = self.delta_camadas_ocultas(pesos_matriz[index + 1], delta_matriz[index + 1], ativacao_matriz[index])
+
+        gradientes_matriz = pesos_matriz
+        for index in range(len(gradientes_matriz)):
+            for index2 in range(len(gradientes_matriz[index])):
+                print("ativacao matriz: ", ativacao_matriz[index])
+                print("delta matriz: ", delta_matriz[index])
+                print("matriz gradientes:", gradientes_matriz[index])
+        print("matriz inteira: ", gradientes_matriz)
+
+
+
+
     def calcula_saidas(self, registro):
 
         matriz_de_saidas = [[0 for x in range(len(self.pesos_matriz[y]))] for y in range(len(self.pesos_matriz))]
