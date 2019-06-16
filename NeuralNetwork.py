@@ -6,21 +6,21 @@ class NeuralNetwork:
     def __init__(self, entradas, camadas):
 
         print("inicializando matriz de pesos da rede neural")
-        self.weights_matrix = [[None for x in range(camadas[y])] for y in range(len(camadas))]
+        self.pesos_matriz = [[None for x in range(camadas[y])] for y in range(len(camadas))]
         for index, camada in enumerate(camadas):
             for index_j in range(0, camadas[index]):
                 if index is 0:
-                    self.weights_matrix[index][index_j] = [1 for _ in range(0, entradas)]
+                    self.pesos_matriz[index][index_j] = [randint(1, 9) for _ in range(0, entradas)]
                 else:
-                    self.weights_matrix[index][index_j] = [1 for _ in range(0, camadas[index - 1])]
+                    self.pesos_matriz[index][index_j] = [randint(1, 9) for _ in range(0, camadas[index - 1])]
 
         print("Pesos das camadas:")
-        for index, line in enumerate(self.weights_matrix):
+        for index, line in enumerate(self.pesos_matriz):
             print(line)
 
     def calcula_saidas(self, registro):
 
-        matriz_de_saidas = [[0 for x in range(len(self.weights_matrix[y]))] for y in range(len(self.weights_matrix))]
+        matriz_de_saidas = [[0 for x in range(len(self.pesos_matriz[y]))] for y in range(len(self.pesos_matriz))]
 
         result = registro.pop()
 
