@@ -33,7 +33,8 @@ class NeuralNetwork:
                     matriz_de_saidas[index][index_j] = self.sigmoide(np.matmul(matriz_de_saidas[index - 1], self.pesos_matriz[index][index_j]))
         for i in range(0, len(matriz_de_saidas)):
             for j in range(0, len(matriz_de_saidas[i])):
-                print("Saida do nueronio: ", j, " da camada ", i, "eh: ", matriz_de_saidas[i][j])
+        return matriz_de_saidas
+                print("Saída do nueronio: ", j, " da camada ", i, "é: ", matriz_de_saidas[i][j])
 
     def corrige_pesos(self, matriz_de_saidas, resultado):
         pass
