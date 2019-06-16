@@ -17,7 +17,7 @@ def main():
         dataset_file = args[2]
 
     else:
-        print("Selecione seu dataset: \n 1 - Ionosphere \n 2 - Pima \n 3 - Wdbc \n 4 - Wine")
+        print("Selecione seu dataset: \n 1 - Ionosphere \n 2 - Pima \n 3 - Wdbc \n 4 - Wine \n 5 - Teste")
         escolha = int(input("Escolha: "))
         if escolha is 1:
             dataset_file = "./datasets/ionosphere.csv"
@@ -27,6 +27,8 @@ def main():
             dataset_file = "./datasets/wdbc.csv"
         elif escolha is 4:
             dataset_file = "./datasets/wine.csv"
+        elif escolha is 5:
+            dataset_file = "./datasets/teste.csv"
         else:
             print("Escolha invalida")
             exit()
@@ -44,9 +46,10 @@ def main():
     dataset = DataHandler(dataset_file)
     dataset.normalizeData()
 
-    entradas = len(dataset.data[0]) - 1
+    entradas = len(dataset.data[0])
     nn = NeuralNetwork(entradas, camadas)
-    nn.calcula_saidas(dataset.data[0])
+    for data in dataset.data:
+        nn.treina_rede(dataset.data[0], dataset.results[0], alpha)
 
 if __name__ == '__main__':
     main()
