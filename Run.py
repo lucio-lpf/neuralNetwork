@@ -10,6 +10,7 @@ alpha = 0.01
 def main():
 
     network_file = "network_default.txt"
+    initial_weights_file = None
     args = sys.argv[1:]
     if len(args) is 3:
         network_file = args[0]
@@ -32,7 +33,6 @@ def main():
         else:
             print("Escolha invalida")
             exit()
-
     camadas = []
     fator_regularizacao = None
     with open(network_file) as network:
@@ -47,7 +47,8 @@ def main():
     dataset.normalizeData()
 
     entradas = len(dataset.data[0])
-    nn = NeuralNetwork(entradas, camadas)
+
+    nn = NeuralNetwork(entradas, camadas, initial_weights_file)
     for data in dataset.data:
         nn.treina_rede(dataset.data[0], dataset.results[0], alpha)
 

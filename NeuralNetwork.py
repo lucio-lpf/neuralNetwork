@@ -2,23 +2,47 @@ import numpy.matlib as np
 import math
 from random import randint
 from copy import copy, deepcopy
+import csv
 
 class NeuralNetwork:
 
-    def __init__(self, entradas, camadas):
+    def __init__(self, entradas, camadas, initial_weights_file):
 
-        print("inicializando matriz de pesos da rede neural")
-        self.pesos_matriz = [[None for x in range(camadas[y])] for y in range(len(camadas))]
-        for index, camada in enumerate(camadas):
-            for index_j in range(0, camadas[index]):
-                if index is 0:
-                    self.pesos_matriz[index][index_j] = [((index+1)*(index_j+1) + 1) for _ in range(0, entradas)]
-                else:
-                    self.pesos_matriz[index][index_j] = [((index+1)*(index_j+1) + 1)   for _ in range(0, camadas[index - 1])]
+        print("Inicializando matriz de pesos da rede neural")
+        self.pesos_matriz = [[[] for x in range(camadas[y])] for y in range(len(camadas))]
+        self.bias_matriz = [[[] for x in range(camadas[y])] for y in range(len(camadas))]
+        if initial_weights_file is None:
+            for index, camada in enumerate(camadas):
+                for index_j in range(0, camadas[index]):
+                    if index is 0:
+                        self.pesos_matriz[index][index_j] = [((index+1)*(index_j+1) + 1) for _ in range(0, entradas)]
+                    else:
+                        self.pesos_matriz[index][index_j] = [((index+1)*(index_j+1) + 1) for _ in range(0, camadas[index - 1])]
+                    self.bias_matriz[index][index_j] = randint(1, 9) / 10
+        else:
+            with open(initial_weights_file) as weights_file:
+                dataFrame = csv.reader(weights_file, delimiter=",", quoting=csv.QUOTE_NONE)
+                for index, file_row in enumerate(dataFrame):
+                    passou_bias = False
+                    neuronio_num = 0
+                    for weight in file_row:
+                        if passou_bias is False:
+                            self.bias_matriz[index][neuronio_num] = float(weight)
+                            passou_bias = True
+                        elif ";" in weight:
+                            ultimo_peso, prox_bias = weight.split(";")
+                            self.pesos_matriz[index][neuronio_num].append(float(ultimo_peso))
+                            neuronio_num += 1
+                            self.bias_matriz[index][neuronio_num] = float(prox_bias)
+                        else:
+                            self.pesos_matriz[index][neuronio_num].append(float(weight))
 
+        print("Bias por neuronio:")
+        for index, line in enumerate(self.bias_matriz):
+            print("Camada: ", index, "  ", line)
         print("Pesos das camadas:")
         for index, line in enumerate(self.pesos_matriz):
-            print(line)
+            print("Camada: ", index, "  ", line)
 
     def treina_rede(self, atributos, resultado, alfa):
         pesos_mat = deepcopy(self.pesos_matriz)
@@ -65,8 +89,8 @@ class NeuralNetwork:
                     matriz_de_saidas[index][index_j] = self.sigmoide(np.matmul(matriz_de_saidas[index - 1], self.pesos_matriz[index][index_j]))
         for i in range(0, len(matriz_de_saidas)):
             for j in range(0, len(matriz_de_saidas[i])):
-                print("Saída do neuronio: ", j, " da camada ", i, "é: ", matriz_de_saidas[i][j])
-            return matriz_de_saidas
+                print("Saída do nueronio: ", j, " da camada ", i, "é: ", matriz_de_saidas[i][j])
+        return matriz_de_saidas
 
     def corrige_pesos(self, matriz_de_saidas, resultado):
         pass
@@ -119,4 +143,3 @@ class NeuralNetwork:
                 g = gradientes[index][index2]
                 pesos_atualizados[index][index2] = p - alfa * g * custo
         return pesos_atualizados
-
