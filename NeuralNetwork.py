@@ -37,3 +37,41 @@ class NeuralNetwork:
 
     def corrige_pesos(self, matriz_de_saidas, resultado):
         pass
+
+    def sigmoide(self, funcao):
+        sig = 1 / (1 + math.exp(-funcao))
+        return sig
+
+    def delta_camada_saida(self, saidas_rede, saidas_esperada):
+        delta = [None] * (len(saidas_rede))
+        for index in range(len(saidas_rede)):
+            delta[index] = saidas_rede[index] - float(saidas_esperada[index])
+        return delta
+
+    def delta_camadas_ocultas(self, thetas_ligacao, deltas_anteriores, ativacao_do_neuronio):
+        deltas = [0] * (len(ativacao_do_neuronio))
+        for index in range(0, len(deltas)):
+            for index2 in range(0, len(thetas_ligacao)):
+                theta = thetas_ligacao[index2][index]
+                delta = deltas_anteriores[index2]
+                deltas[index] = deltas[index] + theta*delta
+            deltas[index] = deltas[index] * ativacao_do_neuronio[index] * (1 - ativacao_do_neuronio[index])
+        return deltas
+
+    def gradientes_do_peso(self, ativacao, delta_camada_anterior):
+        return ativacao * delta_camada_anterior
+
+    def funcao_custo_J(self, dataset, resultados_certos, saidas_funcao):
+        n = len(dataset)
+        sum = 0
+        for index in range(0, len(dataset)):
+            log_saida = math.log10(saidas_funcao[index])
+            log_um_menos_saida = math.log10(1 - saidas_funcao[index])
+            resultado = resultados_certos[index]
+            sum = sum - resultado*log_saida - (1 - resultado)*log_um_menos_saida
+        custo_J = (1/n) * sum
+        return custo_J
+
+    def atualizacao_do_peso(self, peso_atual, alfa, gradiente, custo):
+        return peso_atual - alfa*gradiente*custo
+
