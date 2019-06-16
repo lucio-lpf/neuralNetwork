@@ -15,9 +15,9 @@ class NeuralNetwork:
             for index, camada in enumerate(camadas):
                 for index_j in range(0, camadas[index]):
                     if index is 0:
-                        self.pesos_matriz[index][index_j] = [((index+1)*(index_j+1) + 1) for _ in range(0, entradas)]
+                        self.pesos_matriz[index][index_j] = [randint(1,9) for _ in range(0, entradas)]
                     else:
-                        self.pesos_matriz[index][index_j] = [((index+1)*(index_j+1) + 1) for _ in range(0, camadas[index - 1])]
+                        self.pesos_matriz[index][index_j] = [randint(1,9) for _ in range(0, camadas[index - 1])]
                     self.bias_matriz[index][index_j] = randint(1, 9) / 10
         else:
             with open(initial_weights_file) as weights_file:
@@ -44,11 +44,12 @@ class NeuralNetwork:
         for index, line in enumerate(self.pesos_matriz):
             print("Camada: ", index, "  ", line)
 
-    def treina_rede(self, atributos, resultado, alfa):
+    def treina_rede(self, atributos, resultado, alfa, dataset, results):
         pesos_mat = deepcopy(self.pesos_matriz)
         ativacao_matriz = deepcopy(self.calcula_saidas(atributos))
         saida_da_rede = ativacao_matriz[len(ativacao_matriz) - 1]
         delta_matriz = deepcopy(ativacao_matriz)
+        para_gradiente = [atributos] + ativacao_matriz
 
         for index in reversed(range(len(delta_matriz))):
             if index == len(delta_matriz) - 1:
@@ -60,20 +61,27 @@ class NeuralNetwork:
         len_matriz = len(gradientes_matriz)
         for index in range(len_matriz):
                 delta = delta_matriz[index]
-                ativacao = ativacao_matriz[index]
+                ativacao = para_gradiente[index]
                 matriz = gradientes_matriz[index]
                 gradientes_matriz[index] = self.gradientes_do_peso(ativacao, delta)
 
-        custo = 0.3
-        #Calcular custo
+        saidas_da_rede = []
+        for data in dataset:
+            saidas = deepcopy(self.calcula_saidas(atributos))
+            saida = saidas[len(saidas) - 1]
+            saidas_da_rede.append(saida)
+        custo = self.funcao_custo_J(dataset, results, saidas_da_rede)
+        print("custo: ", custo)
 
         len_matriz = len(pesos_mat)
         for index in range(len_matriz):
             gradientes = gradientes_matriz[index]
             pesos = pesos_mat[index]
             pesos_mat[index] = self.atualizacao_do_peso(pesos, gradientes, alfa, custo)
-        print("matriz de pesos: ", pesos_mat)
         self.pesos_matriz = pesos_mat
+
+
+        return custo
 
     def calcula_saidas(self, registro):
 
@@ -82,14 +90,14 @@ class NeuralNetwork:
         for index in range(0, len(matriz_de_saidas)):
             if index is 0:
                 for index_j in range(0, len(matriz_de_saidas[index])):
-                    print(self.pesos_matriz[index][index_j])
+                    #print(self.pesos_matriz[index][index_j])
                     matriz_de_saidas[0][index_j] = self.sigmoide(np.matmul(registro, self.pesos_matriz[index][index_j]))
             else:
                 for index_j in range(0, len(matriz_de_saidas[index])):
                     matriz_de_saidas[index][index_j] = self.sigmoide(np.matmul(matriz_de_saidas[index - 1], self.pesos_matriz[index][index_j]))
-        for i in range(0, len(matriz_de_saidas)):
-            for j in range(0, len(matriz_de_saidas[i])):
-                print("Saída do nueronio: ", j, " da camada ", i, "é: ", matriz_de_saidas[i][j])
+        #for i in range(0, len(matriz_de_saidas)):
+        #    for j in range(0, len(matriz_de_saidas[i])):
+                #print("Saída do nueronio: ", j, " da camada ", i, "é: ", matriz_de_saidas[i][j])
         return matriz_de_saidas
 
     def corrige_pesos(self, matriz_de_saidas, resultado):
@@ -116,24 +124,28 @@ class NeuralNetwork:
         return deltas
 
     def gradientes_do_peso(self, ativacao, delta_camada_anterior):
-        gradiente = [[0] * (len(delta_camada_anterior))] * (len(ativacao))
+        gradiente = [[0] * (len(ativacao))] * (len(delta_camada_anterior))
         for index in range(len(ativacao)):
             for index2 in range(len(delta_camada_anterior)):
                 atv = ativacao[index]
                 delta = delta_camada_anterior[index2]
-                gradiente[index][index2] = atv * delta
+                gradiente[index2][index] = atv * delta
         return gradiente
 
     def funcao_custo_J(self, dataset, resultados_certos, saidas_funcao):
         n = len(dataset)
-        sum = 0
+        custos_J = [0] * (len(resultados_certos[0]))
         for index in range(0, len(dataset)):
-            log_saida = math.log10(saidas_funcao[index])
-            log_um_menos_saida = math.log10(1 - saidas_funcao[index])
-            resultado = resultados_certos[index]
-            sum = sum - resultado*log_saida - (1 - resultado)*log_um_menos_saida
-        custo_J = (1/n) * sum
-        return custo_J
+            for index2 in range(len(resultados_certos[index])):
+                s = saidas_funcao[index][index2]
+                log_saida = math.log10(s)
+                log_um_menos_saida = math.log10(1 - s)
+                resultado = resultados_certos[index][index2]
+                custos_J[index2] = custos_J[index2] - resultado*log_saida - (1 - resultado)*log_um_menos_saida
+
+        for index in range(len(custos_J)):
+            custos_J[index] = (1/n) * custos_J[index]
+        return custos_J
 
     def atualizacao_do_peso(self, pesos, gradientes, alfa, custo):
         pesos_atualizados = deepcopy(pesos)
@@ -141,5 +153,5 @@ class NeuralNetwork:
             for index2 in range(len(pesos[index])):
                 p = pesos[index][index2]
                 g = gradientes[index][index2]
-                pesos_atualizados[index][index2] = p - alfa * g * custo
+                pesos_atualizados[index][index2] = p - alfa * g * custo[0]
         return pesos_atualizados

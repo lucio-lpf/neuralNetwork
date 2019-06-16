@@ -3,7 +3,7 @@ from NeuralNetwork import *
 import sys
 import csv
 
-alpha = 0.01
+alpha = 0.001
 
 #treina o modelo
 
@@ -49,8 +49,11 @@ def main():
     entradas = len(dataset.data[0])
 
     nn = NeuralNetwork(entradas, camadas, initial_weights_file)
-    for data in dataset.data:
-        nn.treina_rede(dataset.data[0], dataset.results[0], alpha)
+    custo = [2]
+    while custo[0] > 0.2:
+        for index, data in enumerate(dataset.data):
+            custo = nn.treina_rede(data, dataset.results[index], alpha, dataset.data, dataset.results)
+
 
 if __name__ == '__main__':
     main()
