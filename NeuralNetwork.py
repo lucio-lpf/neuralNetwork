@@ -27,10 +27,10 @@ class NeuralNetwork:
         for index in range(0, len(matriz_de_saidas)):
             if index is 0:
                 for index_j in range(0, len(matriz_de_saidas[index])):
-                    matriz_de_saidas[0][index_j] = np.matmul(registro, self.weights_matrix[index][index_j])
+                    matriz_de_saidas[0][index_j] = self.sigmoide(np.matmul(registro, self.pesos_matriz[index][index_j]))
             else:
                 for index_j in range(0, len(matriz_de_saidas[index])):
-                    matriz_de_saidas[index][index_j] = np.matmul(matriz_de_saidas[index - 1], self.weights_matrix[index][index_j])
+                    matriz_de_saidas[index][index_j] = self.sigmoide(np.matmul(matriz_de_saidas[index - 1], self.pesos_matriz[index][index_j]))
         for i in range(0, len(matriz_de_saidas)):
             for j in range(0, len(matriz_de_saidas[i])):
                 print("Saida do nueronio: ", j, " da camada ", i, "eh: ", matriz_de_saidas[i][j])
