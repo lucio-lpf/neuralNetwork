@@ -33,7 +33,7 @@ class NeuralNetwork:
                     matriz_de_saidas[index][index_j] = np.matmul(matriz_de_saidas[index - 1], self.weights_matrix[index][index_j])
         for i in range(0, len(matriz_de_saidas)):
             for j in range(0, len(matriz_de_saidas[i])):
-                print("Saída do nueronio: ", j, " da camada ", i, "é: ", matriz_de_saidas[i][j])
+                print("Saida do nueronio: ", j, " da camada ", i, "eh: ", matriz_de_saidas[i][j])
 
     def corrige_pesos(self, matriz_de_saidas, resultado):
         pass
