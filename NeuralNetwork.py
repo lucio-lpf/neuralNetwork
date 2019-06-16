@@ -1,4 +1,6 @@
 import numpy.matlib as np
+import math
+from random import randint
 
 
 class NeuralNetwork:
