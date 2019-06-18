@@ -49,8 +49,8 @@ def main():
     entradas = len(dataset.data[0])
 
     nn = NeuralNetwork(entradas, camadas, initial_weights_file)
-    custo = [2]
-    while custo[0] > 0.2:
+    custo = 2
+    while custo > 0.01:
         for index, data in enumerate(dataset.data):
             custo = nn.treina_rede(data, dataset.results[index], alpha, dataset.data, dataset.results)
 

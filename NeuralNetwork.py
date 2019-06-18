@@ -71,8 +71,8 @@ class NeuralNetwork:
             saidas = deepcopy(self.calcula_saidas(atributos))
             saida = saidas[len(saidas) - 1]
             saidas_da_rede.append(saida)
-        custo = self.funcao_custo_J(dataset, results, saidas_da_rede)
-        print("custo:", custo[0])
+        custo = sum(self.funcao_custo_J(dataset, results, saidas_da_rede))
+        print("custo:", custo)
 
         len_matriz = len(pesos_mat)
         for index in range(len_matriz):
@@ -81,7 +81,7 @@ class NeuralNetwork:
             pesos_mat[index] = self.atualizacao_do_peso(pesos, gradientes, alfa, custo)
         for i in range(len(self.bias_matriz)):
             for j in range(len(self.bias_matriz[i])):
-                self.bias_matriz[i][j] -= alfa*delta_matriz[i][j]*custo[0]
+                self.bias_matriz[i][j] -= alfa*delta_matriz[i][j]*custo
         self.pesos_matriz = pesos_mat
 
 
@@ -155,5 +155,5 @@ class NeuralNetwork:
             for index2 in range(len(pesos[index])):
                 p = pesos[index][index2]
                 g = gradientes[index][index2]
-                pesos_atualizados[index][index2] = p - alfa * g * custo[0]
+                pesos_atualizados[index][index2] = p - alfa * g * custo
         return pesos_atualizados
