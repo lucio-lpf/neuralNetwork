@@ -57,6 +57,7 @@ class NeuralNetwork:
             else:
                 delta_matriz[index] = self.delta_camadas_ocultas(pesos_mat[index + 1], delta_matriz[index + 1], ativacao_matriz[index])
 
+
         gradientes_matriz = deepcopy(pesos_mat)
         len_matriz = len(gradientes_matriz)
         for index in range(len_matriz):
@@ -71,14 +72,19 @@ class NeuralNetwork:
             saida = saidas[len(saidas) - 1]
             saidas_da_rede.append(saida)
         custo = self.funcao_custo_J(dataset, results, saidas_da_rede)
-        print("custo: ", custo)
+        print("custo:", custo[0])
 
         len_matriz = len(pesos_mat)
         for index in range(len_matriz):
             gradientes = gradientes_matriz[index]
             pesos = pesos_mat[index]
             pesos_mat[index] = self.atualizacao_do_peso(pesos, gradientes, alfa, custo)
+        for i in range(len(self.bias_matriz)):
+            for j in range(len(self.bias_matriz[i])):
+                self.bias_matriz[i][j] -= alfa*delta_matriz[i][j]*custo[0]
         self.pesos_matriz = pesos_mat
+
+
 
 
         return custo
@@ -91,17 +97,13 @@ class NeuralNetwork:
             if index is 0:
                 for index_j in range(0, len(matriz_de_saidas[index])):
                     #print(self.pesos_matriz[index][index_j])
-                    matriz_de_saidas[0][index_j] = self.sigmoide(np.matmul(registro, self.pesos_matriz[index][index_j]))
+
+                    matriz_de_saidas[0][index_j] = self.sigmoide(np.matmul(registro, self.pesos_matriz[index][index_j]) + self.bias_matriz[index][index_j])
             else:
                 for index_j in range(0, len(matriz_de_saidas[index])):
-                    matriz_de_saidas[index][index_j] = self.sigmoide(np.matmul(matriz_de_saidas[index - 1], self.pesos_matriz[index][index_j]))
-        #for i in range(0, len(matriz_de_saidas)):
-        #    for j in range(0, len(matriz_de_saidas[i])):
-                #print("Saída do nueronio: ", j, " da camada ", i, "é: ", matriz_de_saidas[i][j])
-        return matriz_de_saidas
+                    matriz_de_saidas[index][index_j] = self.sigmoide(np.matmul(matriz_de_saidas[index - 1], self.pesos_matriz[index][index_j]) + self.bias_matriz[index][index_j])
 
-    def corrige_pesos(self, matriz_de_saidas, resultado):
-        pass
+        return matriz_de_saidas
 
     def sigmoide(self, funcao):
         sig = 1 / (1 + math.exp(-funcao))

@@ -3,7 +3,7 @@ from NeuralNetwork import *
 import sys
 import csv
 
-alpha = 0.001
+alpha = 0.005
 
 #treina o modelo
 
