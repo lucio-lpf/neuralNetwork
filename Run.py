@@ -53,5 +53,15 @@ def main():
     for index, data in enumerate(dataset.data):
         custo = nn.treina_rede(data, dataset.results[index], alpha, dataset.data, dataset.results)
 
+def createKFolds(dataFrame, k):
+    shuffle(dataFrame)
+    listOfDataFrames = []
+    size = len(dataFrame) // k
+    next = len(dataFrame) // k
+    for index in range(0, k):
+        listOfDataFrames.append(dataFrame[index * size:next])
+        next = next + size
+    return listOfDataFrames
+
 if __name__ == '__main__':
     main()
