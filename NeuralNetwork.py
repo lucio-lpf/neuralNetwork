@@ -138,12 +138,20 @@ class NeuralNetwork:
         return deltas
 
     def gradientes_do_peso(self, ativacao, delta_camada_anterior, pesos_da_camada):
-        gradiente = [[0] * (len(ativacao))] * (len(delta_camada_anterior))
+        #gradiente = [[0] * (len(ativacao))] * (len(delta_camada_anterior))
+        gradiente = []
+        for i1 in range(len(delta_camada_anterior)):
+            gradiente.append([])
+            for i2 in range(len(ativacao)):
+                gradiente[i1].append(0)
+
         for index in range(len(ativacao)):
+            #gradiente.append([])
             for index2 in range(len(delta_camada_anterior)):
                 atv = ativacao[index]
                 delta = delta_camada_anterior[index2]
                 gradiente[index2][index] = (atv * delta) + self.fator_regularizacao*pesos_da_camada[index2][index]
+                #gradiente[index].append(atv * delta)
         return gradiente
 
     def funcao_custo_J(self, dataset, resultados_certos, saidas_funcao):
