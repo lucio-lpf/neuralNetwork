@@ -52,25 +52,10 @@ class NeuralNetwork:
         ativacao_matriz = deepcopy(self.calcula_saidas(atributos))
         saida_da_rede = ativacao_matriz[len(ativacao_matriz) - 1]
 
-        print("Saida rede neuras: ", saida_da_rede)
-        delta_matriz = deepcopy(ativacao_matriz)
-        para_gradiente = [atributos] + ativacao_matriz
+        delta_matriz = self.calcula_deltas(ativacao_matriz, resultado)
+        gradientes_matriz = self.calcula_gradientes(atributos, ativacao_matriz, delta_matriz)
+        gradientes_matriz_bias = deepcopy(delta_matriz)
 
-        for index in reversed(range(len(delta_matriz))):
-            if index == len(delta_matriz) - 1:
-                delta_matriz[index] = self.delta_camada_saida(saida_da_rede, resultado)
-            else:
-                delta_matriz[index] = self.delta_camadas_ocultas(pesos_mat[index + 1], delta_matriz[index + 1], ativacao_matriz[index])
-
-
-        gradientes_matriz = deepcopy(pesos_mat)
-        len_matriz = len(gradientes_matriz)
-        for index in range(len_matriz):
-                delta = delta_matriz[index]
-                ativacao = para_gradiente[index]
-                matriz = gradientes_matriz[index]
-                gradientes_matriz[index] = self.gradientes_do_peso(ativacao, delta, self.pesos_matriz[index])
-        print(gradientes_matriz)
         saidas_da_rede = []
         for data in dataset:
             saidas = deepcopy(self.calcula_saidas(atributos))
@@ -103,19 +88,48 @@ class NeuralNetwork:
         return custo
 
     def calcula_saidas(self, registro):
-
         matriz_de_saidas = [[0 for x in range(len(self.pesos_matriz[y]))] for y in range(len(self.pesos_matriz))]
-
         for index in range(0, len(matriz_de_saidas)):
             if index is 0:
                 for index_j in range(0, len(matriz_de_saidas[index])):
-                    #print(self.pesos_matriz[index][index_j])
-
                     matriz_de_saidas[0][index_j] = self.sigmoide(np.matmul(registro, self.pesos_matriz[index][index_j]) + self.bias_matriz[index][index_j])
             else:
                 for index_j in range(0, len(matriz_de_saidas[index])):
                     matriz_de_saidas[index][index_j] = self.sigmoide(np.matmul(matriz_de_saidas[index - 1], self.pesos_matriz[index][index_j]) + self.bias_matriz[index][index_j])
+
         return matriz_de_saidas
+
+    def calcula_deltas(self, saidas_matriz, resultados_corretos):
+        delta_matriz = [[0 for x in range(len(saidas_matriz[y]))] for y in range(len(saidas_matriz))]
+        index_camada_saidas = len(saidas_matriz) - 1
+
+        for index_delta in range(len(saidas_matriz[index_camada_saidas])):
+            print(saidas_matriz[index_camada_saidas][index_delta])
+            delta_matriz[index_camada_saidas][index_delta] = saidas_matriz[index_camada_saidas][index_delta] - resultados_corretos[index_delta]
+
+        for index_camada in reversed(range(len(delta_matriz) - 1)):
+            for index_delta in range(len(delta_matriz[index_camada])):
+                delta_matriz[index_camada][index_delta] = saidas_matriz[index_camada][index_delta]*(1 - saidas_matriz[index_camada][index_delta])
+                soma_pesos = 0
+                for index,peso in enumerate(self.pesos_matriz[index_camada + 1]):
+                    soma_pesos += peso[index_delta]*delta_matriz[index_camada + 1][index]
+                delta_matriz[index_camada][index_delta] = delta_matriz[index_camada][index_delta]*soma_pesos
+
+        return delta_matriz
+
+    def calcula_gradientes(self, registro, ativacao_matriz, delta_matriz):
+        gradiente_matriz = [[[] for x in range(len(self.pesos_matriz[y]))] for y in range(len(self.pesos_matriz))]
+        for index_camada in range(len(gradiente_matriz)):
+            for index_neuron in range(len(gradiente_matriz[index_camada])):
+                for index_gradiente in range(len(self.pesos_matriz[index_camada][index_neuron])):
+                    if index_camada is 0:
+                        valor_gradiente_peso = registro[index_gradiente] * delta_matriz[index_camada][index_neuron] + self.fator_regularizacao*self.pesos_matriz[index_camada][index_neuron][index_gradiente]
+                        gradiente_matriz[index_camada][index_neuron].append(valor_gradiente_peso)
+                    else:
+                        valor_gradiente_peso = ativacao_matriz[index_camada - 1][index_neuron]*delta_matriz[index_camada][index_neuron] + self.fator_regularizacao*self.pesos_matriz[index_camada][index_neuron][index_gradiente]
+                        gradiente_matriz[index_camada][index_neuron].append(valor_gradiente_peso)
+        return gradiente_matriz
+
 
     def sigmoide(self, funcao):
         sig = 1 / (1 + math.exp(-funcao))
