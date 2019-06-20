@@ -56,16 +56,13 @@ class NeuralNetwork:
         gradientes_matriz = self.calcula_gradientes(atributos, ativacao_matriz, delta_matriz)
         gradientes_matriz_bias = deepcopy(delta_matriz)
 
-        print("matriz gradiente", gradientes_matriz)
-        print("gradiente bias:", gradientes_matriz_bias)
-        print("==============================")
         saidas_da_rede = []
         for data in dataset:
-            saidas = deepcopy(self.calcula_saidas(atributos))
+            saidas = deepcopy(self.calcula_saidas(data))
             saida = saidas[len(saidas) - 1]
             saidas_da_rede.append(saida)
+
         taxa_regularizacao_custo = self.calcula_taxa_regularizacao(len(dataset))
-        print(taxa_regularizacao_custo)
         custo = sum(self.funcao_custo_J(dataset, results, saidas_da_rede)) + taxa_regularizacao_custo
         print(custo)
 
@@ -79,10 +76,6 @@ class NeuralNetwork:
                 self.bias_matriz[i][j] -= alfa*delta_matriz[i][j]*custo
 
         self.pesos_matriz = pesos_mat
-
-
-
-
         return custo
 
     def calcula_saidas(self, registro):
@@ -102,7 +95,6 @@ class NeuralNetwork:
         index_camada_saidas = len(saidas_matriz) - 1
 
         for index_delta in range(len(saidas_matriz[index_camada_saidas])):
-            print(saidas_matriz[index_camada_saidas][index_delta])
             delta_matriz[index_camada_saidas][index_delta] = saidas_matriz[index_camada_saidas][index_delta] - resultados_corretos[index_delta]
 
         for index_camada in reversed(range(len(delta_matriz) - 1)):
@@ -121,10 +113,10 @@ class NeuralNetwork:
             for index_neuron in range(len(gradiente_matriz[index_camada])):
                 for index_gradiente in range(len(self.pesos_matriz[index_camada][index_neuron])):
                     if index_camada is 0:
-                        valor_gradiente_peso = registro[index_gradiente] * delta_matriz[index_camada][index_neuron] + self.fator_regularizacao*self.pesos_matriz[index_camada][index_neuron][index_gradiente]
+                        valor_gradiente_peso = registro[index_gradiente] * delta_matriz[index_camada][index_neuron] #+ self.fator_regularizacao*self.pesos_matriz[index_camada][index_neuron][index_gradiente]
                         gradiente_matriz[index_camada][index_neuron].append(valor_gradiente_peso)
                     else:
-                        valor_gradiente_peso = ativacao_matriz[index_camada - 1][index_gradiente]*delta_matriz[index_camada][index_neuron] + self.fator_regularizacao*self.pesos_matriz[index_camada][index_neuron][index_gradiente]
+                        valor_gradiente_peso = ativacao_matriz[index_camada - 1][index_gradiente]*delta_matriz[index_camada][index_neuron] #+ self.fator_regularizacao*self.pesos_matriz[index_camada][index_neuron][index_gradiente]
                         gradiente_matriz[index_camada][index_neuron].append(valor_gradiente_peso)
         return gradiente_matriz
 
@@ -141,38 +133,8 @@ class NeuralNetwork:
         sig = 1 / (1 + math.exp(-funcao))
         return sig
 
-    def delta_camada_saida(self, saidas_rede, saidas_esperada):
-        delta = [None] * (len(saidas_rede))
-        for index in range(len(saidas_rede)):
-            delta[index] = saidas_rede[index] - float(saidas_esperada[index])
-        return delta
-
-    def delta_camadas_ocultas(self, thetas_ligacao, deltas_anteriores, ativacao_do_neuronio):
-        deltas = [0] * (len(ativacao_do_neuronio))
-        for index in range(0, len(deltas)):
-            for index2 in range(0, len(thetas_ligacao)):
-                theta = thetas_ligacao[index2][index]
-                delta = deltas_anteriores[index2]
-                deltas[index] = deltas[index] + theta*delta
-            deltas[index] = deltas[index] * ativacao_do_neuronio[index] * (1 - ativacao_do_neuronio[index])
-        return deltas
-
-    def gradientes_do_peso(self, ativacao, delta_camada_anterior, pesos_da_camada):
-        #gradiente = [[0] * (len(ativacao))] * (len(delta_camada_anterior))
-        gradiente = []
-        for i1 in range(len(delta_camada_anterior)):
-            gradiente.append([])
-            for i2 in range(len(ativacao)):
-                gradiente[i1].append(0)
-
-        for index in range(len(ativacao)):
-            #gradiente.append([])
-            for index2 in range(len(delta_camada_anterior)):
-                atv = ativacao[index]
-                delta = delta_camada_anterior[index2]
-                gradiente[index2][index] = (atv * delta) + self.fator_regularizacao*pesos_da_camada[index2][index]
-                #gradiente[index].append(atv * delta)
-        return gradiente
+    def verificacao_numerica(self):
+        pass
 
     def funcao_custo_J(self, dataset, resultados_certos, saidas_funcao):
         n = len(dataset)
