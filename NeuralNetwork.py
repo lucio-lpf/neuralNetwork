@@ -56,6 +56,10 @@ class NeuralNetwork:
         gradientes_matriz = self.calcula_gradientes(atributos, ativacao_matriz, delta_matriz)
         gradientes_matriz_bias = deepcopy(delta_matriz)
 
+        print("matriz gradiente", gradientes_matriz)
+        print("gradiente bias:", gradientes_matriz_bias)
+        print("==============================")
+        return 0
         saidas_da_rede = []
         for data in dataset:
             saidas = deepcopy(self.calcula_saidas(atributos))
@@ -111,7 +115,7 @@ class NeuralNetwork:
             for index_delta in range(len(delta_matriz[index_camada])):
                 delta_matriz[index_camada][index_delta] = saidas_matriz[index_camada][index_delta]*(1 - saidas_matriz[index_camada][index_delta])
                 soma_pesos = 0
-                for index,peso in enumerate(self.pesos_matriz[index_camada + 1]):
+                for index, peso in enumerate(self.pesos_matriz[index_camada + 1]):
                     soma_pesos += peso[index_delta]*delta_matriz[index_camada + 1][index]
                 delta_matriz[index_camada][index_delta] = delta_matriz[index_camada][index_delta]*soma_pesos
 
@@ -126,7 +130,7 @@ class NeuralNetwork:
                         valor_gradiente_peso = registro[index_gradiente] * delta_matriz[index_camada][index_neuron] + self.fator_regularizacao*self.pesos_matriz[index_camada][index_neuron][index_gradiente]
                         gradiente_matriz[index_camada][index_neuron].append(valor_gradiente_peso)
                     else:
-                        valor_gradiente_peso = ativacao_matriz[index_camada - 1][index_neuron]*delta_matriz[index_camada][index_neuron] + self.fator_regularizacao*self.pesos_matriz[index_camada][index_neuron][index_gradiente]
+                        valor_gradiente_peso = ativacao_matriz[index_camada - 1][index_gradiente]*delta_matriz[index_camada][index_neuron] + self.fator_regularizacao*self.pesos_matriz[index_camada][index_neuron][index_gradiente]
                         gradiente_matriz[index_camada][index_neuron].append(valor_gradiente_peso)
         return gradiente_matriz
 
