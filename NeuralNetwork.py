@@ -59,20 +59,14 @@ class NeuralNetwork:
         print("matriz gradiente", gradientes_matriz)
         print("gradiente bias:", gradientes_matriz_bias)
         print("==============================")
-        return 0
         saidas_da_rede = []
         for data in dataset:
             saidas = deepcopy(self.calcula_saidas(atributos))
             saida = saidas[len(saidas) - 1]
             saidas_da_rede.append(saida)
-
-        custo = sum(self.funcao_custo_J(dataset, results, saidas_da_rede))
-        soma_todos_thetas = 0
-        for line in self.pesos_matriz:
-            for column in line:
-                for theta in column:
-                    soma_todos_thetas += theta*theta
-        custo += (self.fator_regularizacao * soma_todos_thetas)/ (2*len(dataset))
+        taxa_regularizacao_custo = self.calcula_taxa_regularizacao(len(dataset))
+        print(taxa_regularizacao_custo)
+        custo = sum(self.funcao_custo_J(dataset, results, saidas_da_rede)) + taxa_regularizacao_custo
         print(custo)
 
         len_matriz = len(pesos_mat)
@@ -134,6 +128,14 @@ class NeuralNetwork:
                         gradiente_matriz[index_camada][index_neuron].append(valor_gradiente_peso)
         return gradiente_matriz
 
+    def calcula_taxa_regularizacao(self, tamanho_dados):
+        soma_thetas = 0
+        for camadas in self.pesos_matriz:
+            for neuronio in camadas:
+                for peso in neuronio:
+                    soma_thetas += pow(peso, 2)
+
+        return ((soma_thetas* self.fator_regularizacao)/(2*tamanho_dados))
 
     def sigmoide(self, funcao):
         sig = 1 / (1 + math.exp(-funcao))
