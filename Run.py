@@ -3,14 +3,14 @@ from NeuralNetwork import *
 import sys
 import csv
 
-alpha = 0.005
+alpha = 0.01
 
 #treina o modelo
 
 def main():
 
     network_file = "network_default.txt"
-    initial_weights_file = "initial_weights.txt"
+    initial_weights_file = None#"initial_weights.txt"
     args = sys.argv[1:]
     if len(args) is 3:
         network_file = args[0]
@@ -44,16 +44,27 @@ def main():
                 camadas.append(int(row[0]))
 
     dataset = DataHandler(dataset_file)
-    #dataset.normalizeData()
+    dataset.normalizeData()
 
     entradas = len(dataset.data[0])
 
     nn = NeuralNetwork(entradas, camadas, initial_weights_file, fator_regularizacao)
     custo = 2
-    for index, data in enumerate(dataset.data):
-        custo = nn.treina_rede(data, dataset.results[index], alpha, dataset.data, dataset.results)
-        print(custo)
+    while custo > 0.5:
+        for index, data in enumerate(dataset.data):
+            # ativacao_matriz = nn.calcula_saidas(data)
+            # saida_da_rede = ativacao_matriz[len(ativacao_matriz) - 1]
+            #
+            # delta_matriz = nn.calcula_deltas(ativacao_matriz, dataset.results[index])
+            #
+            # gradientes_matriz = nn.calcula_gradientes(data, ativacao_matriz, delta_matriz)
+            # gradientes_matriz_bias = deepcopy(delta_matriz)
+            #
+            #
+            custo = nn.treina_rede(data, dataset.results[index], alpha, dataset.data, dataset.results)
+    nn.print_matrizes()
 
+    
 def createKFolds(dataFrame, k):
     shuffle(dataFrame)
     listOfDataFrames = []

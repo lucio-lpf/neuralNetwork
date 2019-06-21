@@ -57,30 +57,12 @@ class NeuralNetwork:
         gradientes_matriz = self.calcula_gradientes(atributos, ativacao_matriz, delta_matriz)
         gradientes_matriz_bias = deepcopy(delta_matriz)
 
-        print("Gradiente das camadas:")
-        for index, line in enumerate(gradientes_matriz):
-            print("Camada: ", index, "  ", line)
+        custo = self.calcula_custos(dataset, results)
 
+        self.atualiza_pesos(gradientes_matriz, 0.01, custo)
 
-        saidas_da_rede = []
-        for data in dataset:
-            saidas = deepcopy(self.calcula_saidas(data))
-            saida = saidas[len(saidas) - 1]
-            saidas_da_rede.append(saida)
+        custo = self.calcula_custos(dataset, results)
 
-        taxa_regularizacao_custo = self.calcula_taxa_regularizacao(len(dataset))
-        custo = sum(self.funcao_custo_J(dataset, results, saidas_da_rede)) + taxa_regularizacao_custo
-        print(custo)
-        len_matriz = len(pesos_mat)
-        for index in range(len_matriz):
-            gradientes = gradientes_matriz[index]
-            pesos = pesos_mat[index]
-            pesos_mat[index] = self.atualizacao_do_peso(pesos, gradientes, alfa, custo)
-        for i in range(len(self.bias_matriz)):
-            for j in range(len(self.bias_matriz[i])):
-                self.bias_matriz[i][j] -= alfa*delta_matriz[i][j]*custo
-
-        self.pesos_matriz = pesos_mat
         return custo
 
     def calcula_saidas(self, registro):
@@ -118,12 +100,25 @@ class NeuralNetwork:
             for index_neuron in range(len(gradiente_matriz[index_camada])):
                 for index_gradiente in range(len(self.pesos_matriz[index_camada][index_neuron])):
                     if index_camada is 0:
-                        valor_gradiente_peso = registro[index_gradiente] * delta_matriz[index_camada][index_neuron] #+ self.fator_regularizacao*self.pesos_matriz[index_camada][index_neuron][index_gradiente]
+                        valor_gradiente_peso = registro[index_gradiente] * delta_matriz[index_camada][index_neuron] + self.fator_regularizacao*self.pesos_matriz[index_camada][index_neuron][index_gradiente]
                         gradiente_matriz[index_camada][index_neuron].append(valor_gradiente_peso)
                     else:
-                        valor_gradiente_peso = ativacao_matriz[index_camada - 1][index_gradiente]*delta_matriz[index_camada][index_neuron] #+ self.fator_regularizacao*self.pesos_matriz[index_camada][index_neuron][index_gradiente]
+                        valor_gradiente_peso = ativacao_matriz[index_camada - 1][index_gradiente]*delta_matriz[index_camada][index_neuron] + self.fator_regularizacao*self.pesos_matriz[index_camada][index_neuron][index_gradiente]
                         gradiente_matriz[index_camada][index_neuron].append(valor_gradiente_peso)
         return gradiente_matriz
+
+    def calcula_custos(self, dataset, resultados):
+        custo_total = 0
+        for index_dado, dado in enumerate(dataset):
+            saidas_calculada = self.calcula_saidas(dado)[-1]
+            for index_saida, saida in enumerate(saidas_calculada):
+                parte_ativa = -resultados[index_dado][index_saida] * (math.log10(saida))
+                parte_inativa = - (1 - resultados[index_dado][index_saida])*(math.log10(1 - saida))
+                custo_total += parte_ativa + parte_inativa
+
+        custo_total = custo_total/len(dataset) + self.calcula_taxa_regularizacao(len(dataset))
+        return custo_total
+
 
     def calcula_taxa_regularizacao(self, tamanho_dados):
         soma_thetas = 0
@@ -141,26 +136,8 @@ class NeuralNetwork:
     def verificacao_numerica(self):
         pass
 
-    def funcao_custo_J(self, dataset, resultados_certos, saidas_funcao):
-        n = len(dataset)
-        custos_J = [0] * (len(resultados_certos[0]))
-        for index in range(0, len(dataset)):
-            for index2 in range(len(resultados_certos[index])):
-                s = saidas_funcao[index][index2]
-                log_saida = math.log10(s)
-                log_um_menos_saida = math.log10(1 - s)
-                resultado = resultados_certos[index][index2]
-                custos_J[index2] = custos_J[index2] - resultado*log_saida - (1 - resultado)*log_um_menos_saida
-
-        for index in range(len(custos_J)):
-            custos_J[index] = (1/n) * custos_J[index]
-        return custos_J
-
-    def atualizacao_do_peso(self, pesos, gradientes, alfa, custo):
-        pesos_atualizados = deepcopy(pesos)
-        for index in range(len(pesos)):
-            for index2 in range(len(pesos[index])):
-                p = pesos[index][index2]
-                g = gradientes[index][index2]
-                pesos_atualizados[index][index2] = p - alfa * g * custo
-        return pesos_atualizados
+    def atualiza_pesos(self, gradientes_matriz, alpha, custo):
+        for index_camada in range(len(self.pesos_matriz)):
+            for index_neuronio in range(len(self.pesos_matriz[index_camada])):
+                for index_peso in range(len(self.pesos_matriz[index_camada][index_neuronio])):
+                    self.pesos_matriz[index_camada][index_neuronio][index_peso] -= alpha*gradientes_matriz[index_camada][index_neuronio][index_peso]*custo
