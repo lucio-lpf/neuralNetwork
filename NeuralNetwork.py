@@ -10,7 +10,6 @@ class NeuralNetwork:
     def __init__(self, entradas, camadas, initial_weights_file, fator_regularizacao):
 
         print("Inicializando matriz de pesos da rede neural")
-        self.rede_saidas = None
 
         self.fator_regularizacao = fator_regularizacao
         self.pesos_matriz = [[[] for x in range(camadas[y])] for y in range(len(camadas))]
