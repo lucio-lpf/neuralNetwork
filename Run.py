@@ -2,6 +2,8 @@ from DataHandler import DataHandler
 from NeuralNetwork import *
 import sys
 import csv
+import numpy as np
+import matplotlib.pyplot as plt
 
 alpha = 0.01
 
