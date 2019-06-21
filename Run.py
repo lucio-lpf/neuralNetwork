@@ -1,9 +1,8 @@
 from DataHandler import DataHandler
 from NeuralNetwork import *
+from graphs import Graphs
 import sys
 import csv
-import numpy as np
-import matplotlib.pyplot as plt
 
 alpha = 0.01
 
@@ -52,7 +51,8 @@ def main():
 
     nn = NeuralNetwork(entradas, camadas, initial_weights_file, fator_regularizacao)
     custo = 2
-    while custo > 0.6:
+    saida_da_rede = None
+    while(custo > 0.6):
         for index, data in enumerate(dataset.data):
             custo, saida_da_rede = nn.treina_rede(data, dataset.results[index], alpha, dataset.data, dataset.results)
             print(custo)
@@ -62,6 +62,10 @@ def main():
         saidas.append(nn.calcula_saidas(data)[-1])
     for saida in saidas:
         print(saida)
+
+    g = Graphs()
+    g.classificacao(dataset.results, saida_da_rede)
+
 
 
 def createKFolds(dataFrame, k):
