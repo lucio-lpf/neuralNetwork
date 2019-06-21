@@ -3,8 +3,9 @@ from NeuralNetwork import *
 from graphs import Graphs
 import sys
 import csv
+from random import shuffle
 
-alpha = 0.01
+alpha = 0.5
 
 #treina o modelo
 
@@ -51,11 +52,20 @@ def main():
 
     nn = NeuralNetwork(entradas, camadas, initial_weights_file, fator_regularizacao)
     custo = 2
-    saida_da_rede = None
-    while(custo > 0.6):
+    saida_da_rede = []
+    i = 0
+    while(custo > 0.05):
         for index, data in enumerate(dataset.data):
-            custo, saida_da_rede = nn.treina_rede(data, dataset.results[index], alpha, dataset.data, dataset.results)
-            print(custo)
+            custo = nn.treina_rede(data, dataset.results[index], alpha, dataset.data, dataset.results)
+            i = i + 1
+            if i == 500:
+                print(custo)
+                i = 0
+                for index, data in enumerate(dataset.data):
+                    saida_da_rede.append(nn.calcula_saidas(data)[-1])
+                g = Graphs()
+                g.classificacao(dataset.results, saida_da_rede, enfase_f1_score=1)
+
     nn.print_matrizes()
     saidas = []
     for data in dataset.data:
@@ -63,10 +73,10 @@ def main():
     for saida in saidas:
         print(saida)
 
+    for index, data in enumerate(dataset.data):
+        saida_da_rede.append(nn.calcula_saidas(data)[-1])
     g = Graphs()
-    g.classificacao(dataset.results, saida_da_rede)
-
-
+    g.classificacao(dataset.results, saida_da_rede, enfase_f1_score=1)
 
 def createKFolds(dataFrame, k):
     shuffle(dataFrame)
