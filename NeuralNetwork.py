@@ -18,10 +18,10 @@ class NeuralNetwork:
             for index, camada in enumerate(camadas):
                 for index_j in range(0, camadas[index]):
                     if index is 0:
-                        self.pesos_matriz[index][index_j] = [randint(1,9) for _ in range(0, entradas)]
+                        self.pesos_matriz[index][index_j] = [randint(-1, 9)*0.1 for _ in range(0, entradas)]
                     else:
-                        self.pesos_matriz[index][index_j] = [randint(1,9) for _ in range(0, camadas[index - 1])]
-                    self.bias_matriz[index][index_j] = randint(1, 9) / 10
+                        self.pesos_matriz[index][index_j] = [randint(-1, 9)*0.1 for _ in range(0, camadas[index - 1])]
+                    self.bias_matriz[index][index_j] = randint(-1, 9)*0.1 / 10
         else:
             with open(initial_weights_file) as weights_file:
                 dataFrame = csv.reader(weights_file, delimiter=",", quoting=csv.QUOTE_NONE)
