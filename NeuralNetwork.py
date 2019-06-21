@@ -10,7 +10,10 @@ class NeuralNetwork:
     def __init__(self, entradas, camadas, initial_weights_file, fator_regularizacao):
 
         print("Inicializando matriz de pesos da rede neural")
-
+        self.gradientes = None
+        self.mini_batch = 0
+        self.hora_de_atualizar = 0
+        self.custo = 0
         self.fator_regularizacao = fator_regularizacao
         self.pesos_matriz = [[[] for x in range(camadas[y])] for y in range(len(camadas))]
         self.bias_matriz = [[[] for x in range(camadas[y])] for y in range(len(camadas))]
@@ -50,20 +53,40 @@ class NeuralNetwork:
             print("Camada: ", index, "  ", line)
 
     def treina_rede(self, atributos, resultado, alfa, dataset, results):
+        self.hora_de_atualizar = len(dataset)
+
         pesos_mat = deepcopy(self.pesos_matriz)
         ativacao_matriz = self.calcula_saidas(atributos)
         saida_da_rede = ativacao_matriz[len(ativacao_matriz) - 1]
 
         delta_matriz = self.calcula_deltas(ativacao_matriz, resultado)
 
+        self.custo = self.calcula_custos(dataset, results)
+
+
+        if self.mini_batch < 0 and self.gradientes != None:
+            self.mini_batch = self.hora_de_atualizar
+            for i in range(len(self.gradientes)):
+                for j in range(len(self.gradientes[i])):
+                    for w in range(len(self.gradientes[i][j])):
+                        self.gradientes[i][j][w] = 0
+            gradientes_matriz_bias = deepcopy(delta_matriz)
+            self.atualiza_pesos(self.gradientes, gradientes_matriz_bias, alfa, self.custo)
+
+
         gradientes_matriz = self.calcula_gradientes(atributos, ativacao_matriz, delta_matriz)
-        gradientes_matriz_bias = deepcopy(delta_matriz)
+        if self.gradientes == None:
+            self.gradientes = deepcopy(gradientes_matriz)
+        else:
+            for i in range(len(self.gradientes)):
+                for j in range(len(self.gradientes[i])):
+                    for w in range(len(self.gradientes[i][j])):
+                        self.gradientes[i][j][w] = self.gradientes[i][j][w] + gradientes_matriz[i][j][w]
 
-        custo = self.calcula_custos(dataset, results)
+        self.mini_batch -= 1
 
-        self.atualiza_pesos(gradientes_matriz, gradientes_matriz_bias, 0.01, custo)
 
-        return custo, saidas_da_rede
+        return self.custo
 
     def calcula_saidas(self, registro):
         matriz_de_saidas = [[0 for x in range(len(self.pesos_matriz[y]))] for y in range(len(self.pesos_matriz))]
