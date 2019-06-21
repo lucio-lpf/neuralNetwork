@@ -64,7 +64,7 @@ class NeuralNetwork:
 
         self.atualiza_pesos(gradientes_matriz, gradientes_matriz_bias, 0.01, custo)
 
-        return custo
+        return custo, saidas_da_rede
 
     def calcula_saidas(self, registro):
         matriz_de_saidas = [[0 for x in range(len(self.pesos_matriz[y]))] for y in range(len(self.pesos_matriz))]
