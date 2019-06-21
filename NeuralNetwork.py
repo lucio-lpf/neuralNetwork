@@ -1,14 +1,19 @@
 import numpy.matlib as np
 import math
 from random import randint
-from copy import copy, deepcopy
+from copy import deepcopy
 import csv
+import numpy as np
 
 class NeuralNetwork:
 
     def __init__(self, entradas, camadas, initial_weights_file, fator_regularizacao):
 
         print("Inicializando matriz de pesos da rede neural")
+        self.gradientes = None
+        self.mini_batch = 0
+        self.hora_de_atualizar = 0
+        self.custo = 0
         self.fator_regularizacao = fator_regularizacao
         self.pesos_matriz = [[[] for x in range(camadas[y])] for y in range(len(camadas))]
         self.bias_matriz = [[[] for x in range(camadas[y])] for y in range(len(camadas))]
@@ -16,10 +21,10 @@ class NeuralNetwork:
             for index, camada in enumerate(camadas):
                 for index_j in range(0, camadas[index]):
                     if index is 0:
-                        self.pesos_matriz[index][index_j] = [randint(1,9) for _ in range(0, entradas)]
+                        self.pesos_matriz[index][index_j] = [randint(-1, 9)*0.1 for _ in range(0, entradas)]
                     else:
-                        self.pesos_matriz[index][index_j] = [randint(1,9) for _ in range(0, camadas[index - 1])]
-                    self.bias_matriz[index][index_j] = randint(1, 9) / 10
+                        self.pesos_matriz[index][index_j] = [randint(-1, 9)*0.1 for _ in range(0, camadas[index - 1])]
+                    self.bias_matriz[index][index_j] = randint(-1, 9)*0.1 / 10
         else:
             with open(initial_weights_file) as weights_file:
                 dataFrame = csv.reader(weights_file, delimiter=",", quoting=csv.QUOTE_NONE)
@@ -48,20 +53,40 @@ class NeuralNetwork:
             print("Camada: ", index, "  ", line)
 
     def treina_rede(self, atributos, resultado, alfa, dataset, results):
+        self.hora_de_atualizar = len(dataset)
+
         pesos_mat = deepcopy(self.pesos_matriz)
         ativacao_matriz = self.calcula_saidas(atributos)
         saida_da_rede = ativacao_matriz[len(ativacao_matriz) - 1]
 
         delta_matriz = self.calcula_deltas(ativacao_matriz, resultado)
 
+        self.custo = self.calcula_custos(dataset, results)
+
+
+        if self.mini_batch < 0 and self.gradientes != None:
+            self.mini_batch = self.hora_de_atualizar
+            for i in range(len(self.gradientes)):
+                for j in range(len(self.gradientes[i])):
+                    for w in range(len(self.gradientes[i][j])):
+                        self.gradientes[i][j][w] = 0
+            gradientes_matriz_bias = deepcopy(delta_matriz)
+            self.atualiza_pesos(self.gradientes, gradientes_matriz_bias, alfa, self.custo)
+
+
         gradientes_matriz = self.calcula_gradientes(atributos, ativacao_matriz, delta_matriz)
-        gradientes_matriz_bias = deepcopy(delta_matriz)
+        if self.gradientes == None:
+            self.gradientes = deepcopy(gradientes_matriz)
+        else:
+            for i in range(len(self.gradientes)):
+                for j in range(len(self.gradientes[i])):
+                    for w in range(len(self.gradientes[i][j])):
+                        self.gradientes[i][j][w] = self.gradientes[i][j][w] + gradientes_matriz[i][j][w]
 
-        custo = self.calcula_custos(dataset, results)
+        self.mini_batch -= 1
 
-        self.atualiza_pesos(gradientes_matriz, gradientes_matriz_bias, 0.01, custo)
 
-        return custo
+        return self.custo
 
     def calcula_saidas(self, registro):
         matriz_de_saidas = [[0 for x in range(len(self.pesos_matriz[y]))] for y in range(len(self.pesos_matriz))]
@@ -128,6 +153,10 @@ class NeuralNetwork:
 
 
     def sigmoide(self, funcao):
+        if funcao < -20:
+            return 0
+        if funcao > 20:
+            return 1
         sig = 1 / (1 + math.exp(-funcao))
         return sig
 
@@ -137,6 +166,6 @@ class NeuralNetwork:
     def atualiza_pesos(self, gradientes_matriz, gradiente_matriz_bias, alpha, custo):
         for index_camada in range(len(self.pesos_matriz)):
             for index_neuronio in range(len(self.pesos_matriz[index_camada])):
-                self.bias_matriz[index_camada][index_neuronio] = alpha*gradiente_matriz_bias[index_camada][index_neuronio]*custo
+                self.bias_matriz[index_camada][index_neuronio] = alpha*gradiente_matriz_bias[index_camada][index_neuronio]
                 for index_peso in range(len(self.pesos_matriz[index_camada][index_neuronio])):
-                    self.pesos_matriz[index_camada][index_neuronio][index_peso] -= alpha*gradientes_matriz[index_camada][index_neuronio][index_peso]*custo
+                    self.pesos_matriz[index_camada][index_neuronio][index_peso] -= alpha*gradientes_matriz[index_camada][index_neuronio][index_peso]
