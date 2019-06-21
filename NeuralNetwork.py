@@ -1,14 +1,18 @@
 import numpy.matlib as np
 import math
 from random import randint
-from copy import copy, deepcopy
+from copy import deepcopy
 import csv
+import numpy as np
+import matplotlib.pyplot as plt
 
 class NeuralNetwork:
 
     def __init__(self, entradas, camadas, initial_weights_file, fator_regularizacao):
 
         print("Inicializando matriz de pesos da rede neural")
+        self.rede_saidas = None
+
         self.fator_regularizacao = fator_regularizacao
         self.pesos_matriz = [[[] for x in range(camadas[y])] for y in range(len(camadas))]
         self.bias_matriz = [[[] for x in range(camadas[y])] for y in range(len(camadas))]
