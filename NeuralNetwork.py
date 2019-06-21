@@ -143,6 +143,6 @@ class NeuralNetwork:
     def atualiza_pesos(self, gradientes_matriz, gradiente_matriz_bias, alpha, custo):
         for index_camada in range(len(self.pesos_matriz)):
             for index_neuronio in range(len(self.pesos_matriz[index_camada])):
-                self.bias_matriz[index_camada][index_neuronio] = alpha*gradiente_matriz_bias[index_camada][index_neuronio]*custo
+                self.bias_matriz[index_camada][index_neuronio] = alpha*gradiente_matriz_bias[index_camada][index_neuronio]
                 for index_peso in range(len(self.pesos_matriz[index_camada][index_neuronio])):
-                    self.pesos_matriz[index_camada][index_neuronio][index_peso] -= alpha*gradientes_matriz[index_camada][index_neuronio][index_peso]*custo
+                    self.pesos_matriz[index_camada][index_neuronio][index_peso] -= alpha*gradientes_matriz[index_camada][index_neuronio][index_peso]
