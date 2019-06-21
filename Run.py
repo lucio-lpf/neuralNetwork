@@ -50,7 +50,7 @@ def main():
 
     nn = NeuralNetwork(entradas, camadas, initial_weights_file, fator_regularizacao)
     custo = 2
-    while custo > 0.5:
+    while custo > 0.6:
         for index, data in enumerate(dataset.data):
             # ativacao_matriz = nn.calcula_saidas(data)
             # saida_da_rede = ativacao_matriz[len(ativacao_matriz) - 1]
@@ -62,9 +62,15 @@ def main():
             #
             #
             custo = nn.treina_rede(data, dataset.results[index], alpha, dataset.data, dataset.results)
+            print(custo)
     nn.print_matrizes()
+    saidas = []
+    for data in dataset.data:
+        saidas.append(nn.calcula_saidas(data)[-1])
+    for saida in saidas:
+        print(saida)
 
-    
+
 def createKFolds(dataFrame, k):
     shuffle(dataFrame)
     listOfDataFrames = []

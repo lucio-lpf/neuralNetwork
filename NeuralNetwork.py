@@ -59,9 +59,7 @@ class NeuralNetwork:
 
         custo = self.calcula_custos(dataset, results)
 
-        self.atualiza_pesos(gradientes_matriz, 0.01, custo)
-
-        custo = self.calcula_custos(dataset, results)
+        self.atualiza_pesos(gradientes_matriz, gradientes_matriz_bias, 0.01, custo)
 
         return custo
 
@@ -116,7 +114,7 @@ class NeuralNetwork:
                 parte_inativa = - (1 - resultados[index_dado][index_saida])*(math.log10(1 - saida))
                 custo_total += parte_ativa + parte_inativa
 
-        custo_total = custo_total/len(dataset) + self.calcula_taxa_regularizacao(len(dataset))
+        custo_total = custo_total/(2*len(dataset)) + self.calcula_taxa_regularizacao(len(dataset))
         return custo_total
 
 
@@ -136,8 +134,9 @@ class NeuralNetwork:
     def verificacao_numerica(self):
         pass
 
-    def atualiza_pesos(self, gradientes_matriz, alpha, custo):
+    def atualiza_pesos(self, gradientes_matriz, gradiente_matriz_bias, alpha, custo):
         for index_camada in range(len(self.pesos_matriz)):
             for index_neuronio in range(len(self.pesos_matriz[index_camada])):
+                self.bias_matriz[index_camada][index_neuronio] = alpha*gradiente_matriz_bias[index_camada][index_neuronio]*custo
                 for index_peso in range(len(self.pesos_matriz[index_camada][index_neuronio])):
                     self.pesos_matriz[index_camada][index_neuronio][index_peso] -= alpha*gradientes_matriz[index_camada][index_neuronio][index_peso]*custo
