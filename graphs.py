@@ -5,8 +5,53 @@ class Graphs:
     def __init__(self):
         print("inicializa gráficos")
 
+    def f1score(self, confusion_matrix, enfase):
+        vps = []
+        fns = []
+        fps = []
 
-    def classificacao(self, resultados, saida_da_rede):
+        for i in range(len(confusion_matrix)):
+            vps.append(0)
+            fns.append(0)
+            fps.append(0)
+
+        for i in range(len(confusion_matrix)):
+            for j in range(len(confusion_matrix[i])):
+                if i == j:
+                    vps[i] = confusion_matrix[i][j]
+                else:
+                    fns[i] += confusion_matrix[i][j]
+                    fps[i] += confusion_matrix[j][i]
+
+
+        recalls = []
+        precs = []
+        for i in range(len(vps)):
+            if vps[i] + fns[i] == 0:
+                recalls.append(0)
+            else:
+                recalls.append(vps[i]/(vps[i] + fns[i]))
+
+            if vps[i] + fps[i] == 0:
+                precs.append(0)
+            else:
+                precs.append(vps[i]/(vps[i] + fps[i]))
+
+        f1scores = []
+        for i in range(len(vps)):
+            pxr = precs[i] * recalls[i]
+            bxpxr = (enfase * enfase * precs[i]) * recalls[i]
+            if bxpxr != 0:
+                f1scores.append((1 + enfase) * (pxr/bxpxr))
+            else:
+                f1scores.append(0)
+
+        print("F1-SCORES:", f1scores)
+
+
+
+
+    def classificacao(self, resultados, saida_da_rede, enfase_f1_score):
         confusion_matrix = []
         resultados_certos = resultados
         saidas_funcao = saida_da_rede
@@ -23,6 +68,8 @@ class Graphs:
                     for w in range(len(saidas_funcao[i])):
                         if maximum == saidas_funcao[i][w]:
                             confusion_matrix[j][w] += 1
+
+        self.f1score(confusion_matrix, enfase_f1_score)
 
         coluna = []
         linha = []
