@@ -31,7 +31,7 @@ def main():
         elif escolha is 4:
             dataset_file = "./datasets/wine.csv"
         elif escolha is 5:
-            dataset_file = "./datasets/teste2.csv"
+            dataset_file = "./datasets/teste.csv"
         else:
             print("Escolha invalida")
             exit()
@@ -54,16 +54,7 @@ def main():
     custo = 2
     while custo > 0.6:
         for index, data in enumerate(dataset.data):
-            # ativacao_matriz = nn.calcula_saidas(data)
-            # saida_da_rede = ativacao_matriz[len(ativacao_matriz) - 1]
-            #
-            # delta_matriz = nn.calcula_deltas(ativacao_matriz, dataset.results[index])
-            #
-            # gradientes_matriz = nn.calcula_gradientes(data, ativacao_matriz, delta_matriz)
-            # gradientes_matriz_bias = deepcopy(delta_matriz)
-            #
-            #
-            custo = nn.treina_rede(data, dataset.results[index], alpha, dataset.data, dataset.results)
+            custo, saida_da_rede = nn.treina_rede(data, dataset.results[index], alpha, dataset.data, dataset.results)
             print(custo)
     nn.print_matrizes()
     saidas = []
