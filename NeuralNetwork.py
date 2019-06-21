@@ -130,6 +130,10 @@ class NeuralNetwork:
 
 
     def sigmoide(self, funcao):
+        if funcao < -20:
+            return 0
+        if funcao > 20:
+            return 1
         sig = 1 / (1 + math.exp(-funcao))
         return sig
 
