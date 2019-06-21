@@ -52,12 +52,14 @@ class NeuralNetwork:
         ativacao_matriz = self.calcula_saidas(atributos)
         saida_da_rede = ativacao_matriz[len(ativacao_matriz) - 1]
 
-
-
         delta_matriz = self.calcula_deltas(ativacao_matriz, resultado)
 
         gradientes_matriz = self.calcula_gradientes(atributos, ativacao_matriz, delta_matriz)
         gradientes_matriz_bias = deepcopy(delta_matriz)
+
+        print("Gradiente das camadas:")
+        for index, line in enumerate(gradientes_matriz):
+            print("Camada: ", index, "  ", line)
 
 
         saidas_da_rede = []
@@ -68,7 +70,7 @@ class NeuralNetwork:
 
         taxa_regularizacao_custo = self.calcula_taxa_regularizacao(len(dataset))
         custo = sum(self.funcao_custo_J(dataset, results, saidas_da_rede)) + taxa_regularizacao_custo
-
+        print(custo)
         len_matriz = len(pesos_mat)
         for index in range(len_matriz):
             gradientes = gradientes_matriz[index]

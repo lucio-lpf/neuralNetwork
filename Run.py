@@ -10,7 +10,7 @@ alpha = 0.005
 def main():
 
     network_file = "network_default.txt"
-    initial_weights_file = None#"initial_weights.txt"
+    initial_weights_file = "initial_weights.txt"
     args = sys.argv[1:]
     if len(args) is 3:
         network_file = args[0]
@@ -44,16 +44,16 @@ def main():
                 camadas.append(int(row[0]))
 
     dataset = DataHandler(dataset_file)
-    dataset.normalizeData()
+    #dataset.normalizeData()
 
     entradas = len(dataset.data[0])
 
     nn = NeuralNetwork(entradas, camadas, initial_weights_file, fator_regularizacao)
     custo = 2
-    while(custo > 0.2):
-        for index, data in enumerate(dataset.data):
-            custo = nn.treina_rede(data, dataset.results[index], alpha, dataset.data, dataset.results)
-            print(custo)
+    for index, data in enumerate(dataset.data):
+        custo = nn.treina_rede(data, dataset.results[index], alpha, dataset.data, dataset.results)
+        print(custo)
+
 def createKFolds(dataFrame, k):
     shuffle(dataFrame)
     listOfDataFrames = []
