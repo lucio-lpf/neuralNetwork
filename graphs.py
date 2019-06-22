@@ -40,9 +40,9 @@ class Graphs:
         f1scores = []
         for i in range(len(vps)):
             pxr = precs[i] * recalls[i]
-            bxpxr = (enfase * enfase * precs[i]) * recalls[i]
+            bxpxr = (enfase * enfase * precs[i]) + recalls[i]
             if bxpxr != 0:
-                f1scores.append((1 + enfase) * (pxr/bxpxr))
+                f1scores.append((1 + enfase * enfase) * (pxr/bxpxr))
             else:
                 f1scores.append(0)
 
@@ -68,8 +68,6 @@ class Graphs:
                     for w in range(len(saidas_funcao[i])):
                         if maximum == saidas_funcao[i][w]:
                             confusion_matrix[j][w] += 1
-
-        self.f1score(confusion_matrix, enfase_f1_score)
 
         coluna = []
         linha = []
@@ -103,3 +101,4 @@ class Graphs:
         ax.set_title("Harvest of local linha (in tons/year)")
         fig.tight_layout()
         plt.show()
+        self.f1score(confusion_matrix, enfase_f1_score)
