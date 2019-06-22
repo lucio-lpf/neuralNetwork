@@ -46,8 +46,8 @@ def main():
                 camadas.append(int(row[0]))
 
     dataset = DataHandler(dataset_file)
-    batches_dados, batches_resultados = dataset.generate_batches(1)
-    #dataset.normalizeData()
+    dataset.normalizeData()
+    batches_dados, batches_resultados = dataset.generate_batches(3)
 
     entradas = len(dataset.data[0])
 
@@ -58,7 +58,7 @@ def main():
     saida_da_rede = []
     i = 0
     print(custo)
-    while custo > 0.4:
+    while custo > 0.01:
         print(custo)
         for index_batch, batch_dados in enumerate(batches_dados):
             for index_entrada, entrada in enumerate(batch_dados):
@@ -73,6 +73,7 @@ def main():
             if i == 500:
                 print(custo)
                 i = 0
+                saida_da_rede = []
                 for index, data in enumerate(dataset.data):
                     saida_da_rede.append(nn.calcula_saidas(data)[-1])
                 g = Graphs()

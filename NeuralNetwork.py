@@ -114,8 +114,6 @@ class NeuralNetwork:
                 self.gradientes_bias[index_camada] = b.tolist()
 
     def calcula_gradientes_total_regularizados(self, numero_entradas):
-        if self.fator_regularizacao is 0:
-            return
         for index_camada in range(len(self.gradientes)):
             for index_neuronio in range(len(self.gradientes[index_camada])):
                 self.gradientes_bias[index_camada][index_neuronio] = self.gradientes_bias[index_camada][index_neuronio]/numero_entradas
