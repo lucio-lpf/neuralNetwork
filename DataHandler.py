@@ -12,6 +12,11 @@ class DataHandler:
             dataFrame = csv.reader(f, delimiter=",", quoting=csv.QUOTE_NONE)
             all_data = []
             results = []
+            # dataset = []
+            # for row in dataFrame:
+            #     dataset.append(row)
+            # random.shuffle(dataset)
+            # print(dataset)
             for row in dataFrame:
                 data = []
                 result = []
@@ -28,6 +33,9 @@ class DataHandler:
                     i += 1
                 all_data.append(data)
                 results.append(result)
+        zip_content = list(zip(all_data,results))
+        random.shuffle(zip_content)
+        all_data, results = zip(*zip_content)
         return all_data, results
 
     def normalizeData(self):
@@ -44,3 +52,23 @@ class DataHandler:
         for row in self.data:
             for index in range(0, len(row)):
                 row[index] = 2 * ((row[index] - min[index]) / (max[index] - min[index])) - 1
+
+    def generate_batches(self, batch_number):
+        tamanho_dataset = len(self.data)
+        tamanho_novos_dataset = tamanho_dataset/batch_number
+        array_batches = []
+        array_batches_results = []
+        index_dados = 0
+        while len(array_batches) is not batch_number:
+            batch_dados = []
+            batch_resultados = []
+            while len(batch_dados) < tamanho_novos_dataset:
+                try:
+                    batch_dados.append(self.data[index_dados])
+                    batch_resultados.append(self.results[index_dados])
+                except:
+                    break
+                index_dados += 1
+            array_batches.append(batch_dados)
+            array_batches_results.append(batch_resultados)
+        return array_batches, array_batches_results

@@ -31,7 +31,7 @@ def main():
         elif escolha is 4:
             dataset_file = "./datasets/wine.csv"
         elif escolha is 5:
-            dataset_file = "./datasets/teste.csv"
+            dataset_file = "./datasets/teste2.csv"
         else:
             print("Escolha invalida")
             exit()
@@ -46,17 +46,29 @@ def main():
                 camadas.append(int(row[0]))
 
     dataset = DataHandler(dataset_file)
-    dataset.normalizeData()
+    batches_dados, batches_resultados = dataset.generate_batches(1)
+    #dataset.normalizeData()
 
     entradas = len(dataset.data[0])
 
     nn = NeuralNetwork(entradas, camadas, initial_weights_file, fator_regularizacao)
-    custo = 2
+    custo = nn.calcula_custos(dataset.data, dataset.results)
+
+
     saida_da_rede = []
     i = 0
-    while(custo > 0.05):
-        for index, data in enumerate(dataset.data):
-            custo = nn.treina_rede(data, dataset.results[index], alpha, dataset.data, dataset.results)
+    print(custo)
+    while custo > 0.4:
+        print(custo)
+        for index_batch, batch_dados in enumerate(batches_dados):
+            for index_entrada, entrada in enumerate(batch_dados):
+                nn.treina_rede(entrada, batches_resultados[index_batch][index_entrada])
+            nn.calcula_gradientes_total_regularizados(index_entrada + 1)
+            nn.atualiza_pesos(alpha)
+            custo = nn.calcula_custos(dataset.data, dataset.results)
+            nn.gradientes = None
+            nn.gradientes_bias = None
+
             i = i + 1
             if i == 500:
                 print(custo)
@@ -67,12 +79,6 @@ def main():
                 g.classificacao(dataset.results, saida_da_rede, enfase_f1_score=1)
 
     nn.print_matrizes()
-    saidas = []
-    for data in dataset.data:
-        saidas.append(nn.calcula_saidas(data)[-1])
-    for saida in saidas:
-        print(saida)
-
     for index, data in enumerate(dataset.data):
         saida_da_rede.append(nn.calcula_saidas(data)[-1])
     g = Graphs()
