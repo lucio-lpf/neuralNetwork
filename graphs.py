@@ -51,7 +51,7 @@ class Graphs:
 
 
 
-    def classificacao(self, resultados, saida_da_rede, enfase_f1_score):
+    def classificacao(self, resultados, saida_da_rede, epocas, enfase_f1_score):
         confusion_matrix = []
         resultados_certos = resultados
         saidas_funcao = saida_da_rede
@@ -97,8 +97,8 @@ class Graphs:
             for j in range(len(linha)):
                 text = ax.text(j, i, harvest[i, j],
                                ha="center", va="center", color="w")
-
-        ax.set_title("Harvest of local linha (in tons/year)")
+        x = ("Numero de epocas: %d" % epocas)
+        ax.set_title(x)
         fig.tight_layout()
         plt.show()
         self.f1score(confusion_matrix, enfase_f1_score)

@@ -47,7 +47,7 @@ def main():
 
     dataset = DataHandler(dataset_file)
     dataset.normalizeData()
-    batches_dados, batches_resultados = dataset.generate_batches(3)
+    batches_dados, batches_resultados = dataset.generate_batches(1)
 
     entradas = len(dataset.data[0])
 
@@ -57,7 +57,7 @@ def main():
 
     saida_da_rede = []
     i = 0
-    print(custo)
+    epocas = 0
     while custo > 0.01:
         print(custo)
         for index_batch, batch_dados in enumerate(batches_dados):
@@ -65,6 +65,7 @@ def main():
                 nn.treina_rede(entrada, batches_resultados[index_batch][index_entrada])
             nn.calcula_gradientes_total_regularizados(index_entrada + 1)
             nn.atualiza_pesos(alpha)
+            epocas += 1
             custo = nn.calcula_custos(dataset.data, dataset.results)
             nn.gradientes = None
             nn.gradientes_bias = None
@@ -77,13 +78,13 @@ def main():
                 for index, data in enumerate(dataset.data):
                     saida_da_rede.append(nn.calcula_saidas(data)[-1])
                 g = Graphs()
-                g.classificacao(dataset.results, saida_da_rede, enfase_f1_score=1)
+                g.classificacao(dataset.results, saida_da_rede, epocas, enfase_f1_score=1)
 
     nn.print_matrizes()
     for index, data in enumerate(dataset.data):
         saida_da_rede.append(nn.calcula_saidas(data)[-1])
     g = Graphs()
-    g.classificacao(dataset.results, saida_da_rede, enfase_f1_score=1)
+    g.classificacao(dataset.results, saida_da_rede, epocas, enfase_f1_score=1)
 
 def createKFolds(dataFrame, k):
     shuffle(dataFrame)

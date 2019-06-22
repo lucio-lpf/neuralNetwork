@@ -139,10 +139,10 @@ class NeuralNetwork:
         saidas_calculada = self.calcula_saidas(entrada)[-1]
         custo_total = 0
         for index_saida, saida in enumerate(saidas_calculada):
-            parte_ativa = -resultado[index_saida] * (math.log10(saida))
+            parte_ativa = -resultado[index_saida] * (-math.log10(saida))
             parte_inativa = 0
             if saida is not 1:
-                parte_inativa = - (1 - resultado[index_saida]) * (math.log10(1 - saida))
+                parte_inativa = - (1 - resultado[index_saida]) * (-math.log10(1 - saida))
             custo_total += parte_ativa + parte_inativa
         return custo_total
 
@@ -163,8 +163,18 @@ class NeuralNetwork:
         sig = 1 / (1 + math.exp(-funcao))
         return sig
 
-    def verificacao_numerica(self):
-        pass
+    def verificacao_numerica(self, dataset, results, epsilum):
+        gradiente_matriz = [[[] for x in range(len(self.pesos_matriz[y]))] for y in range(len(self.pesos_matriz))]
+        for index_camada in range(len(self.pesos_matriz)):
+                for index_neuronio in range(len(self.pesos_matriz[index_camada])):
+                    for index_peso in range(len(self.pesos_matriz[index_camada][index_neuronio])):
+                        self.pesos_matriz[index_camada][index_neuronio][index_peso] += epsilum
+                        custo_maior = self.calcula_custos(dataset, results)
+                        self.pesos_matriz[index_camada][index_neuronio][index_peso] -= 2*epsilum
+                        custo_menor = self.calcula_custos(dataset, results)
+                        self.pesos_matriz[index_camada][index_neuronio][index_peso] += epsilum
+                        gradiente_matriz[index_camada][index_neuronio].append((custo_maior - custo_menor)/(2*epsilum))
+        print(gradiente_matriz)
 
     def atualiza_pesos(self, alpha):
 
