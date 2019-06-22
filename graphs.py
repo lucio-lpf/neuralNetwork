@@ -56,18 +56,35 @@ class Graphs:
         resultados_certos = resultados
         saidas_funcao = saida_da_rede
 
-        for i in range(len(resultados_certos[0])):
+        if len(resultados[0]) == 1:
+            numero_de_resultados = 2
+        else:
+            numero_de_resultados = len(resultados_certos[0])
+
+        for i in range(numero_de_resultados):
             confusion_matrix.append([])
-            for j in range(len(resultados_certos[0])):
+            for j in range(numero_de_resultados):
                 confusion_matrix[i].append(0)
 
-        for i in range(0, len(resultados_certos)):
-            for j in range(0, len(resultados_certos[0])):
-                if resultados_certos[i][j] > 0:
-                    maximum = max(saidas_funcao[i])
-                    for w in range(len(saidas_funcao[i])):
-                        if maximum == saidas_funcao[i][w]:
-                            confusion_matrix[j][w] += 1
+        if len(resultados[0]) == 1:
+            for i in range(0, len(resultados_certos)):
+                for j in range(0, numero_de_resultados - 1):
+                    if resultados_certos[i][0] > 0 and saidas_funcao[i][0] > 0.5:
+                        confusion_matrix[0][0] += 1
+                    elif resultados_certos[i][0] < 1 and saidas_funcao[i][0] <= 0.5:
+                        confusion_matrix[1][1] += 1
+                    elif resultados_certos[i][0] > 0 and saidas_funcao[i][0] <= 0.5:
+                        confusion_matrix[1][0] += 1
+                    elif resultados_certos[i][0] < 1 and saidas_funcao[i][0] > 0.5:
+                        confusion_matrix[0][1] += 1
+        else:
+            for i in range(0, len(resultados_certos)):
+                for j in range(0, numero_de_resultados):
+                    if resultados_certos[i][j] > 0:
+                        maximum = max(saidas_funcao[i])
+                        for w in range(len(saidas_funcao[i])):
+                            if maximum == saidas_funcao[i][w]:
+                                confusion_matrix[j][w] += 1
 
         coluna = []
         linha = []
