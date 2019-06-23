@@ -110,7 +110,7 @@ def main():
             custo = nn.calcula_custos(dataset.data, dataset.results)
             custos.append(custo)
             i = i + 1
-            if i == 5:
+            if i == 500:
                 print(custo)
                 i = 0
                 saida_da_rede = []
