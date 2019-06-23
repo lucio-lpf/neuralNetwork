@@ -5,7 +5,7 @@ import sys
 import csv
 from random import shuffle
 
-alpha = 3
+alpha = 2
 
 #treina o modelo
 
@@ -90,6 +90,7 @@ def main():
         batches_dados, batches_resultados = dataset.generate_batches(1)
         saida_da_rede = []
         i = 0
+        custos = []
         epocas = 0
         while custo > 0.01:
             print(custo)
@@ -100,6 +101,7 @@ def main():
                 nn.atualiza_pesos(alpha)
                 epocas += 1
                 custo = nn.calcula_custos(dataset.data, dataset.results)
+                custos.append(custo)
                 nn.gradientes = None
                 nn.gradientes_bias = None
 
@@ -111,13 +113,13 @@ def main():
                     for index, data in enumerate(dataset.data):
                         saida_da_rede.append(nn.calcula_saidas(data)[-1])
                     g = Graphs()
-                    g.classificacao(dataset.results, saida_da_rede, epocas, enfase_f1_score=1)
+                    g.classificacao(dataset.results, saida_da_rede, epocas, enfase_f1_score=1, custo=custo, custos=custos)
 
         nn.print_matrizes()
         for index, data in enumerate(dataset.data):
             saida_da_rede.append(nn.calcula_saidas(data)[-1])
         g = Graphs()
-        g.classificacao(dataset.results, saida_da_rede, epocas, enfase_f1_score=1)
+        g.classificacao(dataset.results, saida_da_rede, epocas, enfase_f1_score=1, custo=custo, custos=custos)
 
 def createKFolds(dataFrame, k):
     shuffle(dataFrame)
