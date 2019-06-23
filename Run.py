@@ -12,12 +12,13 @@ alpha = 0.5
 def main():
 
     network_file = "network_default.txt"
-    initial_weights_file = None#"initial_weights.txt"
+    initial_weights_file = None
     args = sys.argv[1:]
     if len(args) is 3:
         network_file = args[0]
         initial_weights_file = args[1]
         dataset_file = args[2]
+
 
     else:
         print("Selecione seu dataset: \n 1 - Ionosphere \n 2 - Pima \n 3 - Wdbc \n 4 - Wine \n 5 - Teste")
@@ -46,45 +47,77 @@ def main():
                 camadas.append(int(row[0]))
 
     dataset = DataHandler(dataset_file)
-    dataset.normalizeData()
-    batches_dados, batches_resultados = dataset.generate_batches(1)
 
     entradas = len(dataset.data[0])
 
     nn = NeuralNetwork(entradas, camadas, initial_weights_file, fator_regularizacao)
     custo = nn.calcula_custos(dataset.data, dataset.results)
 
+    if len(args) is 3:
+        print("FATOR DE REGULARIZACAO: ", fator_regularizacao)
+        print("PESOS INICIAIS:")
+        nn.print_matrizes()
+        for index_data, data in enumerate(dataset.data):
+            print("ENTRADA: ", data)
 
-    saida_da_rede = []
-    i = 0
-    epocas = 0
-    while custo > 0.01:
-        print(custo)
-        for index_batch, batch_dados in enumerate(batches_dados):
-            for index_entrada, entrada in enumerate(batch_dados):
-                nn.treina_rede(entrada, batches_resultados[index_batch][index_entrada])
-            nn.calcula_gradientes_total_regularizados(index_entrada + 1)
-            nn.atualiza_pesos(alpha)
-            epocas += 1
-            custo = nn.calcula_custos(dataset.data, dataset.results)
-            nn.gradientes = None
-            nn.gradientes_bias = None
+            print("SAIDAS:")
+            ativacao_matriz = nn.calcula_saidas(data)
+            printMatriz(ativacao_matriz)
 
-            i = i + 1
-            if i == 500:
-                print(custo)
-                i = 0
-                saida_da_rede = []
-                for index, data in enumerate(dataset.data):
-                    saida_da_rede.append(nn.calcula_saidas(data)[-1])
-                g = Graphs()
-                g.classificacao(dataset.results, saida_da_rede, epocas, enfase_f1_score=1)
+            deltas = nn.calcula_deltas(ativacao_matriz, dataset.results[index_data])
 
-    nn.print_matrizes()
-    for index, data in enumerate(dataset.data):
-        saida_da_rede.append(nn.calcula_saidas(data)[-1])
-    g = Graphs()
-    g.classificacao(dataset.results, saida_da_rede, epocas, enfase_f1_score=1)
+            gradiente_bias = deltas
+            gradiente_pesos = nn.calcula_gradientes(data, ativacao_matriz, deltas)
+            print("GRADIENTES DOS BIAS PARA ENTRADA:")
+            printMatriz(gradiente_bias)
+            print("GRADIENTES DOS PESOS PARA ENTRADA:")
+            printMatriz(gradiente_pesos)
+            nn.atuliza_matriz_gradientes(gradiente_bias, gradiente_pesos)
+        print("\n \n =================== FIM TREINAMENTO ==================== \n")
+        nn.calcula_gradientes_total_regularizados(index_data + 1)
+        print("GRADIENTES BIAS FINAIS DO DATASET:")
+        printMatriz(nn.gradientes_bias)
+        print("GRADIENTES BIAS FINAIS DO DATASET:")
+        printMatriz(nn.gradientes)
+        nn.atualiza_pesos(alpha)
+        print("NOVOS PESSO:")
+        nn.print_matrizes()
+        custo = nn.calcula_custos(dataset.data, dataset.results)
+        print("Custo total: ", custo)
+    else:
+
+        dataset.normalizeData()
+        batches_dados, batches_resultados = dataset.generate_batches(1)
+        saida_da_rede = []
+        i = 0
+        epocas = 0
+        while custo > 0.01:
+            print(custo)
+            for index_batch, batch_dados in enumerate(batches_dados):
+                for index_entrada, entrada in enumerate(batch_dados):
+                    nn.treina_rede(entrada, batches_resultados[index_batch][index_entrada])
+                nn.calcula_gradientes_total_regularizados(index_entrada + 1)
+                nn.atualiza_pesos(alpha)
+                epocas += 1
+                custo = nn.calcula_custos(dataset.data, dataset.results)
+                nn.gradientes = None
+                nn.gradientes_bias = None
+
+                i = i + 1
+                if i == 500:
+                    print(custo)
+                    i = 0
+                    saida_da_rede = []
+                    for index, data in enumerate(dataset.data):
+                        saida_da_rede.append(nn.calcula_saidas(data)[-1])
+                    g = Graphs()
+                    g.classificacao(dataset.results, saida_da_rede, epocas, enfase_f1_score=1)
+
+        nn.print_matrizes()
+        for index, data in enumerate(dataset.data):
+            saida_da_rede.append(nn.calcula_saidas(data)[-1])
+        g = Graphs()
+        g.classificacao(dataset.results, saida_da_rede, epocas, enfase_f1_score=1)
 
 def createKFolds(dataFrame, k):
     shuffle(dataFrame)
@@ -95,6 +128,11 @@ def createKFolds(dataFrame, k):
         listOfDataFrames.append(dataFrame[index * size:next])
         next = next + size
     return listOfDataFrames
+
+def printMatriz(matriz):
+    for index, line in enumerate(matriz):
+        print("\t Camada ", index, ": ", line)
+    print("\n")
 
 if __name__ == '__main__':
     main()
