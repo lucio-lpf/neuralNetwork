@@ -46,12 +46,11 @@ class Graphs:
             else:
                 f1scores.append(0)
 
-        print("F1-SCORES:", f1scores)
+        return  f1scores
 
 
 
-
-    def classificacao(self, resultados, saida_da_rede, epocas, enfase_f1_score):
+    def classificacao(self, resultados, saida_da_rede, epocas, enfase_f1_score, custo, custos):
         confusion_matrix = []
         resultados_certos = resultados
         saidas_funcao = saida_da_rede
@@ -89,7 +88,7 @@ class Graphs:
         coluna = []
         linha = []
         for i in range(len(confusion_matrix[0])):
-            argument = "classe: ", i
+            argument = "classe: %d" % i
             coluna.append(argument)
             linha.append(argument)
 
@@ -114,8 +113,21 @@ class Graphs:
             for j in range(len(linha)):
                 text = ax.text(j, i, harvest[i, j],
                                ha="center", va="center", color="w")
-        x = ("Numero de epocas: %d" % epocas)
-        ax.set_title(x)
+
+        f1_scores = self.f1score(confusion_matrix, enfase_f1_score)
+        t1 = "Número de épocas: %d " % epocas
+        t2 = "com custo: %f" % custo
+        t3 = "\n"
+        for index, f in enumerate(f1_scores):
+            t3 = t3 + "F1 Score da classe %d: " % index
+            t3 = t3 + "%f \n" % f
+        text = t1 + t2 + t3
+        ax.set_title(text)
         fig.tight_layout()
+        ax.text = text
         plt.show()
-        self.f1score(confusion_matrix, enfase_f1_score)
+
+        plt.plot(custos)
+        plt.ylabel('Custo:')
+        plt.xlabel('Épocas:')
+        plt.show()

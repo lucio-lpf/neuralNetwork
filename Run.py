@@ -5,7 +5,7 @@ import sys
 import csv
 from random import shuffle
 
-alpha = 0.5
+alpha = 3
 
 #treina o modelo
 
