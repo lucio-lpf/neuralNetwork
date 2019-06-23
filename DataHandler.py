@@ -72,3 +72,25 @@ class DataHandler:
             array_batches.append(batch_dados)
             array_batches_results.append(batch_resultados)
         return array_batches, array_batches_results
+
+    def ajustar_novo_dataset(self):
+        file = "Datasets/galaxy.csv"
+        with open(file) as f:
+            dataFrame = csv.reader(f, delimiter=",", quoting=csv.QUOTE_NONE)
+            data = []
+            for row in dataFrame:
+                data.append(row[3:])
+            data.pop(0)
+            a = open("galaxy.csv", "w")
+            write = csv.writer(a, delimiter=",", quoting=csv.QUOTE_NONE)
+            for row in data:
+                ultimo = row.pop()
+                penultimo = row.pop()
+                antepenultimo = row.pop()
+                dado = row.pop()
+                dado += ';'
+                dado += antepenultimo
+                row.append(dado)
+                row.append(penultimo)
+                row.append(ultimo)
+                write.writerow(row)

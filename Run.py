@@ -5,12 +5,11 @@ import sys
 import csv
 from random import shuffle
 
-alpha = 2
+alpha = 4
 
 #treina o modelo
 
 def main():
-
     network_file = "network_default.txt"
     initial_weights_file = None
     args = sys.argv[1:]
@@ -21,7 +20,7 @@ def main():
 
 
     else:
-        print("Selecione seu dataset: \n 1 - Ionosphere \n 2 - Pima \n 3 - Wdbc \n 4 - Wine \n 5 - Teste")
+        print("Selecione seu dataset: \n 1 - Ionosphere \n 2 - Pima \n 3 - Wdbc \n 4 - Wine \n 5 - Teste \n 6 - Galaxy ")
         escolha = int(input("Escolha: "))
         if escolha is 1:
             dataset_file = "./datasets/ionosphere.csv"
@@ -33,6 +32,8 @@ def main():
             dataset_file = "./datasets/wine.csv"
         elif escolha is 5:
             dataset_file = "./datasets/teste2.csv"
+        elif escolha is 6:
+            dataset_file = "./datasets/galaxy1.csv"
         else:
             print("Escolha invalida")
             exit()
@@ -87,7 +88,7 @@ def main():
     else:
 
         dataset.normalizeData()
-        batches_dados, batches_resultados = dataset.generate_batches(1)
+        batches_dados, batches_resultados = dataset.generate_batches(100)
         saida_da_rede = []
         i = 0
         custos = []
@@ -100,21 +101,22 @@ def main():
                 nn.calcula_gradientes_total_regularizados(index_entrada + 1)
                 nn.atualiza_pesos(alpha)
                 epocas += 1
-                custo = nn.calcula_custos(dataset.data, dataset.results)
-                custos.append(custo)
+
                 nn.gradientes = None
                 nn.gradientes_bias = None
 
-                i = i + 1
-                if i == 500:
-                    print(custo)
-                    i = 0
-                    saida_da_rede = []
-                    for index, data in enumerate(dataset.data):
-                        saida_da_rede.append(nn.calcula_saidas(data)[-1])
-                    g = Graphs()
-                    g.classificacao(dataset.results, saida_da_rede, epocas, enfase_f1_score=1, custo=custo, custos=custos)
 
+            custo = nn.calcula_custos(dataset.data, dataset.results)
+            custos.append(custo)
+            i = i + 1
+            if i == 5:
+                print(custo)
+                i = 0
+                saida_da_rede = []
+                for index, data in enumerate(dataset.data):
+                    saida_da_rede.append(nn.calcula_saidas(data)[-1])
+                g = Graphs()
+                g.classificacao(dataset.results, saida_da_rede, epocas, enfase_f1_score=1, custo=custo, custos=custos)
         nn.print_matrizes()
         for index, data in enumerate(dataset.data):
             saida_da_rede.append(nn.calcula_saidas(data)[-1])
