@@ -6,6 +6,7 @@ import csv
 from random import shuffle
 
 alpha = 4
+num_batches = 3
 
 #treina o modelo
 
@@ -78,7 +79,7 @@ def main():
         nn.calcula_gradientes_total_regularizados(index_data + 1)
         print("GRADIENTES BIAS FINAIS DO DATASET:")
         printMatriz(nn.gradientes_bias)
-        print("GRADIENTES BIAS FINAIS DO DATASET:")
+        print("GRADIENTES PESOS FINAIS DO DATASET:")
         printMatriz(nn.gradientes)
         nn.atualiza_pesos(alpha)
         print("NOVOS PESSO:")
@@ -88,7 +89,7 @@ def main():
     else:
 
         dataset.normalizeData()
-        batches_dados, batches_resultados = dataset.generate_batches(100)
+        batches_dados, batches_resultados = dataset.generate_batches(num_batches)
         saida_da_rede = []
         i = 0
         custos = []
