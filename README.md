@@ -1,2 +1,2 @@
 # neuralNetwork
-trabalho para disciplina de aprendizado de máquina
+Project from Machine Learning classs
